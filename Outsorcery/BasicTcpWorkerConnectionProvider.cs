@@ -12,12 +12,12 @@ namespace Outsorcery
     using System.Threading.Tasks;
 
     /// <summary>
-    /// TCP network implementation of IOutsourcedWorkerConnectionProvider.
-    /// Implements a very rudimentary load balancing that distributes tasks equally
-    /// across the provided endpoints without taking task complexity or individual
-    /// server workload into account.
+    /// Basic TCP network implementation of IOutsourcedWorkerConnectionProvider.
+    /// Implements a very rudimentary load balancing that distributes tasks sequentially
+    /// across available endpoints without taking task complexity or individual server
+    /// workload into account.
     /// </summary>
-    public class TcpWorkerConnectionProvider : IWorkerConnectionProvider
+    public class BasicTcpWorkerConnectionProvider : IWorkerConnectionProvider
     {
         /// <summary>The default maximum retry attempts</summary>
         private const int DefaultMaxRetryAttempts = 3;
@@ -36,39 +36,39 @@ namespace Outsorcery
         private int _currentPosition;
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="TcpWorkerConnectionProvider"/> class.
+        /// Initializes a new instance of the <see cref="BasicTcpWorkerConnectionProvider"/> class.
         /// </summary>
         /// <param name="endPoint">The end point.</param>
-        public TcpWorkerConnectionProvider(IPEndPoint endPoint)
+        public BasicTcpWorkerConnectionProvider(IPEndPoint endPoint)
             : this(endPoint, DefaultMaxRetryAttempts)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TcpWorkerConnectionProvider" /> class.
+        /// Initializes a new instance of the <see cref="BasicTcpWorkerConnectionProvider" /> class.
         /// </summary>
         /// <param name="endPoint">The end point.</param>
         /// <param name="maxRetryAttempts">The maximum retry attempts.</param>
-        public TcpWorkerConnectionProvider(IPEndPoint endPoint, int maxRetryAttempts)
+        public BasicTcpWorkerConnectionProvider(IPEndPoint endPoint, int maxRetryAttempts)
             : this(new List<IPEndPoint> { endPoint }, maxRetryAttempts)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TcpWorkerConnectionProvider" /> class.
+        /// Initializes a new instance of the <see cref="BasicTcpWorkerConnectionProvider" /> class.
         /// </summary>
         /// <param name="endPoints">The end points.</param>
-        public TcpWorkerConnectionProvider(IEnumerable<IPEndPoint> endPoints) 
+        public BasicTcpWorkerConnectionProvider(IEnumerable<IPEndPoint> endPoints) 
             : this(endPoints, DefaultMaxRetryAttempts)
         {
         }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="TcpWorkerConnectionProvider" /> class.
+        /// Initializes a new instance of the <see cref="BasicTcpWorkerConnectionProvider" /> class.
         /// </summary>
         /// <param name="endPoints">The end points.</param>
         /// <param name="maxRetryAttempts">The maximum retry attempts.</param>
-        public TcpWorkerConnectionProvider(IEnumerable<IPEndPoint> endPoints, int maxRetryAttempts)
+        public BasicTcpWorkerConnectionProvider(IEnumerable<IPEndPoint> endPoints, int maxRetryAttempts)
         {
             Contract.IsNotNull(endPoints);
             Contract.IsNotEmpty(endPoints);
@@ -112,7 +112,7 @@ namespace Outsorcery
                 }
             }
             
-            throw new AggregateException(string.Format(MaxRetriesFailedMessage, _maxRetryAttempts), exceptions);
+            throw new CommunicationException(string.Format(MaxRetriesFailedMessage, _maxRetryAttempts), exceptions);
         }
     }
 }

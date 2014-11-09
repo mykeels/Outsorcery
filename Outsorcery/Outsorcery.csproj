@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommunicationException.cs" />
     <Compile Include="Contract.cs" />
     <Compile Include="IWorkItem.cs" />
     <Compile Include="IWorker.cs" />
@@ -50,7 +51,7 @@
     <Compile Include="OutsourcedWorker.cs" />
     <Compile Include="SerializationHelper.cs" />
     <Compile Include="StreamWorkerConnection.cs" />
-    <Compile Include="TcpWorkerConnectionProvider.cs" />
+    <Compile Include="BasicTcpWorkerConnectionProvider.cs" />
     <Compile Include="TcpWorkServer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

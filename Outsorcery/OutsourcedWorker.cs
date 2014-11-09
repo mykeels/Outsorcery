@@ -4,8 +4,6 @@
 namespace Outsorcery
 {
     using System;
-    using System.Linq;
-    using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -72,19 +70,8 @@ namespace Outsorcery
             }
             catch (Exception ex)
             {
-                if (!_suppressCommunicationExceptions)
-                {
-                    throw;
-                }
-
-                var aggregateException = ex as AggregateException;
-
-                var isCommunicationExceptionOnly = ex is SocketException
-                                                || (aggregateException != null
-                                                    && aggregateException.InnerExceptions != null
-                                                    && aggregateException.InnerExceptions.All(a => a is SocketException));
-
-                if (!isCommunicationExceptionOnly)
+                if (!_suppressCommunicationExceptions
+                    || !(ex is CommunicationException))
                 {
                     throw;
                 }
