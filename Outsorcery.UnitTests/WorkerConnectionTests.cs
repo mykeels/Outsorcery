@@ -11,10 +11,10 @@ namespace Outsorcery.UnitTests
     using NUnit.Framework;
 
     /// <summary>
-    /// Outsourced Worker Connection Tests
+    /// Worker Connection Tests
     /// </summary>
     [TestFixture]
-    public class OutsourcedWorkerConnectionTests
+    public class WorkerConnectionTests
     {
         /// <summary>The test stream</summary>
         private static readonly Stream TestStream = new MemoryStream();

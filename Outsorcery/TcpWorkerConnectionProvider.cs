@@ -85,7 +85,7 @@ namespace Outsorcery
             return selectedConnection.WorkerConnection;
         }
 
-        private async Task<ConnectionResult> AttemptConnection(IPEndPoint endpoint, CancellationToken cancellationToken)
+        private static async Task<ConnectionResult> AttemptConnection(IPEndPoint endpoint, CancellationToken cancellationToken)
         {
             StreamWorkerConnection connection;
             var benchmark = int.MaxValue;

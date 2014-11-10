@@ -121,7 +121,7 @@ namespace Outsorcery
                     return (TResult)result;
                 }
             }
-            catch (Exception)
+            catch
             {
                 if (!_suppressExceptions)
                 {
