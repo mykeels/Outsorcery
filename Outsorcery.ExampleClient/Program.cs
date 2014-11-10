@@ -54,7 +54,7 @@ namespace Outsorcery.ExampleClient
             // Then we define a connection provider for all of our workers 
             // to use.  It is the connection provider's job to provide a
             // connection object to the Worker whenever it requires one.
-            var provider = new TcpWorkerConnectionProvider(LocalEndPoint);
+            var provider = new RoundRobinTcpWorkerConnectionProvider(LocalEndPoint);
 
             // We then create a worker to outsource the work for us. 
             // Workers are reusable and thread-safe.

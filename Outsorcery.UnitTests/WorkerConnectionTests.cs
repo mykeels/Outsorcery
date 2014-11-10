@@ -81,7 +81,7 @@ namespace Outsorcery.UnitTests
         }
 
         /// <summary>
-        /// Test Serializable class
+        /// Test serializable class
         /// </summary>
         [Serializable]
         public class TestSerializableClass

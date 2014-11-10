@@ -7,7 +7,7 @@ namespace Outsorcery
 
     /// <summary>
     /// A workload benchmark based on current system performance.
-    /// The higher then percentage CPU, memory and pagefile used, the higher
+    /// The higher then percentage CPU, memory and page file used, the higher
     /// the benchmark score for our current workload.
     /// </summary>
     public class SystemPerformanceWorkloadBenchmark : IBenchmark
