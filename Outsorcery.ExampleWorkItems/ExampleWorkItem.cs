@@ -48,7 +48,7 @@ namespace Outsorcery.ExampleWorkItems
 
             await Task.Delay(100, cancellationToken).ConfigureAwait(false);
 
-            result.StringValue = string.Join(", ", ExampleList);
+            result.StringValue = string.Join(", ", ExampleList).ToUpper();
 
             Console.WriteLine(
                         "Work complete on this system, result - int: {0}. string: {1}.", 

@@ -68,19 +68,17 @@ namespace Outsorcery
 
                 if (connection.WorkerConnection == null)
                 {
-                    exceptions.Add(connection.Exception ?? new Exception());
+                    exceptions.Add(connection.Exception ?? new Exception(ConnectionFailedUnknownReasonMessage));
                     continue;
                 }
 
-                // This means that threaded attempts won't necessarily be true
-                // round robin, but its an acceptable trade-off of roughly equal distribution
                 _currentPosition = currentPosition;
                 return connection;
             } 
             while (currentAttempt++ < endPointList.Count);
 
             // Completely failed to get a connection
-            return ConnectionResult.FromException(new AggregateException(exceptions));
+            return new ConnectionResult(new AggregateException(exceptions));
         }
     }
 }

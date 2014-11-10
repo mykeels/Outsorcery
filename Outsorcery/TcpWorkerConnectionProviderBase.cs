@@ -16,6 +16,9 @@ namespace Outsorcery
     /// </summary>
     public abstract class TcpWorkerConnectionProviderBase : IWorkerConnectionProvider
     {
+        /// <summary>Connection Failed for an Unknown Reason message</summary>
+        protected const string ConnectionFailedUnknownReasonMessage = "Connection failed for an unknown reason.";
+
         /// <summary>The endpoints</summary>
         private readonly IList<IPEndPoint> _endPoints;
         
@@ -75,9 +78,7 @@ namespace Outsorcery
                                                         int workCategoryId,
                                                         CancellationToken cancellationToken)
         {
-            StreamWorkerConnection connection;
-            var benchmark = int.MaxValue;
-            Exception exception = null;
+            StreamWorkerConnection connection = null;
 
             try
             {
@@ -87,15 +88,22 @@ namespace Outsorcery
                 connection = new StreamWorkerConnection(tcpClient.GetStream());
 
                 await connection.SendIntAsync(workCategoryId, cancellationToken).ConfigureAwait(false);
-                benchmark = await connection.ReceiveIntAsync(cancellationToken).ConfigureAwait(false);
+                var benchmark = await connection.ReceiveIntAsync(cancellationToken).ConfigureAwait(false);
+                
+                // Do our best to invoke a clean up operation if we've been cancelled
+                cancellationToken.ThrowIfCancellationRequested();
+
+                return new ConnectionResult(connection, benchmark);
             }
             catch (Exception ex)
             {
-                connection = null;
-                exception = ex;
-            }
+                if (connection != null)
+                {
+                    connection.Dispose();
+                }
 
-            return new ConnectionResult(connection, benchmark, exception);
+                return new ConnectionResult(ex);
+            }
         }
 
         /// <summary>
@@ -122,12 +130,21 @@ namespace Outsorcery
             /// </summary>
             /// <param name="connection">The connection.</param>
             /// <param name="benchmarkScore">The benchmark score.</param>
-            /// <param name="exception">The exception.</param>
-            public ConnectionResult(StreamWorkerConnection connection, int benchmarkScore, Exception exception)
+            public ConnectionResult(StreamWorkerConnection connection, int benchmarkScore)
                 : this()
             {
                 WorkerConnection = connection;
                 CurrentWorkloadBenchmarkScore = benchmarkScore;
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ConnectionResult"/> struct.
+            /// </summary>
+            /// <param name="exception">The exception.</param>
+            public ConnectionResult(Exception exception)
+                : this()
+            {
+                CurrentWorkloadBenchmarkScore = int.MaxValue;
                 Exception = exception;
             }
 
@@ -154,16 +171,6 @@ namespace Outsorcery
             /// The exception.
             /// </value>
             public Exception Exception { get; private set; }
-
-            /// <summary>
-            /// Creates from the exception.
-            /// </summary>
-            /// <param name="exception">The exception.</param>
-            /// <returns>A connection result.</returns>
-            public static ConnectionResult FromException(Exception exception)
-            {
-                return new ConnectionResult(null, int.MaxValue, exception);
-            }
         }
     }
 }

@@ -26,8 +26,9 @@ namespace Outsorcery.ExampleServer
 
         /// <summary>
         /// An example of the most basic usage of the server.
-        /// When implementing your own, don't forget to reference your work item library,
-        /// the server needs it to understand the client requests and do the work!
+        /// When implementing your own, don't forget to reference your work item library
+        /// in the server project.
+        /// The server needs it to understand the client requests and do the work!
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
@@ -35,13 +36,22 @@ namespace Outsorcery.ExampleServer
         /// </returns>
         public static async Task BasicUsageExample(CancellationToken cancellationToken)
         {
-            Console.WriteLine("====================");
-            Console.WriteLine("Basic Server Example");
-            Console.WriteLine("====================");
+            WriteHeader("Basic Server Example");
 
             await new TcpWorkServer(LocalEndPoint)
                                     .Run(cancellationToken)
                                     .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Writes the header.
+        /// </summary>
+        /// <param name="header">The header.</param>
+        public static void WriteHeader(string header)
+        {
+            Console.WriteLine("====================");
+            Console.WriteLine(header);
+            Console.WriteLine("====================");
         }
     }
 }

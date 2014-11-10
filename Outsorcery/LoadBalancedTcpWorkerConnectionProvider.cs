@@ -3,6 +3,7 @@
  */
 namespace Outsorcery
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -48,24 +49,48 @@ namespace Outsorcery
                                                         CancellationToken cancellationToken)
         {
             // Connect to all end points and get their benchmark figure
-            var connectionTasks = endPoints
-                                        .Select(s => AttemptConnection(s, workCategoryId, cancellationToken))
-                                        .ToList();
+            var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            // TODO: implement a timeout here where we fall back on connection.WhenAny() and take what we can get
-            await Task.WhenAll(connectionTasks).ConfigureAwait(false);
+            var connectionTasks = endPoints
+                                        .Select(s => AttemptConnection(s, workCategoryId, cancellationSource.Token))
+                                        .ToList();
+            
+            // We try our best to get all connection responses but failing that will just take what we can get
+            var allTasksTask = Task.WhenAll(connectionTasks);
+            var timeoutTask = Task.Delay(1000, cancellationToken);
+
+            await Task.WhenAny(allTasksTask, timeoutTask).ConfigureAwait(false);
+            
+            // Cancel any connection attempts that didn't finish in time
+            cancellationSource.Cancel();
 
             // Get all connections that were successful
-            var openConnections = connectionTasks
-                                        .Select(s => s.Result)
-                                        .Where(w => w.WorkerConnection != null)
-                                        .ToList();
+            var completedTasks = connectionTasks
+                                    .Where(s => s.IsCompleted)
+                                    .Select(s => s.Result);
+            
+            var openConnections = completedTasks
+                                    .Where(w => w.WorkerConnection != null)
+                                    .ToList();
+
+            // No open connections, provide a result that explains why
+            if (!openConnections.Any())
+            {
+                var exceptions = connectionTasks
+                                    .Where(s => s.IsCompleted && s.Result.Exception != null)
+                                    .Select(s => s.Result.Exception)
+                                    .ToList();
+
+                return exceptions.Any() 
+                        ? new ConnectionResult(new AggregateException(exceptions))
+                        : new ConnectionResult(new Exception(ConnectionFailedUnknownReasonMessage));
+            }
 
             // Find the connection reporting the lowest workload
             var selectedConnection = openConnections
                                         .OrderBy(o => o.CurrentWorkloadBenchmarkScore)
                                         .FirstOrDefault();
-
+            
             // Close all the connections we don't need
             foreach (var openConnection in openConnections.Where(w => w.WorkerConnection != selectedConnection.WorkerConnection))
             {
