@@ -37,17 +37,19 @@ namespace Outsorcery
         /// Gets a connection from the available endpoints asynchronously.
         /// </summary>
         /// <param name="endPoints">The end points.</param>
+        /// <param name="workCategoryId">The work category identifier.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
         /// An awaitable task, the result is the connection result.
         /// </returns>
         protected override async Task<ConnectionResult> GetConnectionAsync(
                                                         IEnumerable<IPEndPoint> endPoints, 
+                                                        int workCategoryId,
                                                         CancellationToken cancellationToken)
         {
             // Connect to all end points and get their benchmark figure
             var connectionTasks = endPoints
-                                        .Select(s => AttemptConnection(s, cancellationToken))
+                                        .Select(s => AttemptConnection(s, workCategoryId, cancellationToken))
                                         .ToList();
 
             // TODO: implement a timeout here where we fall back on connection.WhenAny() and take what we can get
@@ -65,7 +67,7 @@ namespace Outsorcery
                                         .FirstOrDefault();
 
             // Close all the connections we don't need
-            foreach (var openConnection in openConnections.Where(w => w != selectedConnection))
+            foreach (var openConnection in openConnections.Where(w => w.WorkerConnection != selectedConnection.WorkerConnection))
             {
                 openConnection.WorkerConnection.Dispose();
             }

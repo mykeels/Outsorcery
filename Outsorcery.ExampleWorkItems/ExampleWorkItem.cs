@@ -22,6 +22,17 @@ namespace Outsorcery.ExampleWorkItems
         public List<string> ExampleList { get; set; }
 
         /// <summary>
+        /// Gets the work group identifier.
+        /// </summary>
+        /// <value>
+        /// The work group identifier.
+        /// </value>
+        public int WorkCategoryId
+        {
+            get { return 0; }
+        }
+
+        /// <summary>
         /// Does the work asynchronously.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>

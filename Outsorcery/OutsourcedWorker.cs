@@ -111,7 +111,7 @@ namespace Outsorcery
             try
             {
                 using (var connection = await _connectionProveProvider
-                                                .GetConnectionAsync(cancellationToken)
+                                                .GetConnectionAsync(workItem.WorkCategoryId, cancellationToken)
                                                 .ConfigureAwait(false))
                 {
                     await connection.SendObjectAsync(workItem, cancellationToken).ConfigureAwait(false);

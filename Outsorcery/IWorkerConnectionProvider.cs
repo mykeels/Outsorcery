@@ -14,8 +14,11 @@ namespace Outsorcery
         /// <summary>
         /// Gets a connection asynchronously.
         /// </summary>
+        /// <param name="workCategoryId">The work category identifier.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>An awaitable task. The result is the connection.</returns>
-        Task<IWorkerConnection> GetConnectionAsync(CancellationToken cancellationToken);
+        /// <returns>
+        /// An awaitable task. The result is the connection.
+        /// </returns>
+        Task<IWorkerConnection> GetConnectionAsync(int workCategoryId, CancellationToken cancellationToken);
     }
 }

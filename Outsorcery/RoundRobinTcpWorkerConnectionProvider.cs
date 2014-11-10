@@ -3,6 +3,7 @@
  */
 namespace Outsorcery
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -11,7 +12,8 @@ namespace Outsorcery
 
     /// <summary>
     /// Round Robin TCP Worker Connection Provider
-    /// Distributes work across each server sequentially.
+    /// Distributes each work item to a different endpoint, returning to the first
+    /// endpoint when all endpoints have been visited.
     /// </summary>
     public class RoundRobinTcpWorkerConnectionProvider : TcpWorkerConnectionProviderBase
     {
@@ -40,17 +42,20 @@ namespace Outsorcery
         /// Gets a connection from the available endpoints asynchronously.
         /// </summary>
         /// <param name="endPoints">The end points.</param>
+        /// <param name="workCategoryId">The work category identifier.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
         /// An awaitable task, the result is the connection result.
         /// </returns>
         protected override async Task<ConnectionResult> GetConnectionAsync(
-                                                        IEnumerable<IPEndPoint> endPoints, 
+                                                        IEnumerable<IPEndPoint> endPoints,
+                                                        int workCategoryId,
                                                         CancellationToken cancellationToken)
         {
             var endPointList = endPoints.ToList();
             var currentAttempt = 0;
             var currentPosition = _currentPosition;
+            var exceptions = new List<Exception>();
 
             do
             {
@@ -59,10 +64,13 @@ namespace Outsorcery
                     currentPosition = 0;
                 }
 
-                var connection = await AttemptConnection(endPointList[currentPosition], cancellationToken).ConfigureAwait(false);
+                var connection = await AttemptConnection(endPointList[currentPosition], workCategoryId, cancellationToken).ConfigureAwait(false);
 
                 if (connection.WorkerConnection == null)
+                {
+                    exceptions.Add(connection.Exception ?? new Exception());
                     continue;
+                }
 
                 // This means that threaded attempts won't necessarily be true
                 // round robin, but its an acceptable trade-off of roughly equal distribution
@@ -71,7 +79,8 @@ namespace Outsorcery
             } 
             while (currentAttempt++ < endPointList.Count);
 
-            return null;
+            // Completely failed to get a connection
+            return ConnectionResult.FromException(new AggregateException(exceptions));
         }
     }
 }

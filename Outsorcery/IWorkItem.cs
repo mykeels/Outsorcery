@@ -13,6 +13,14 @@ namespace Outsorcery
     public interface ISerializableWorkItem<TResult>
     {
         /// <summary>
+        /// Gets the work category identifier for this work item.
+        /// </summary>
+        /// <value>
+        /// The work category identifier.
+        /// </value>
+        int WorkCategoryId { get; }
+
+        /// <summary>
         /// Does the work asynchronously.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>

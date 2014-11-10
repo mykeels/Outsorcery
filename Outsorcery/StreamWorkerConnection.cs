@@ -41,12 +41,16 @@ namespace Outsorcery
         /// <exception cref="System.InvalidOperationException">Invalid header size</exception>
         public async Task SendObjectAsync(object obj, CancellationToken cancellationToken)
         {
-            obj = obj ?? new NullRepresentation();
-
-            var data = SerializationHelper.SerializeObject(obj);
-
-            await SendIntAsync(data.Length, cancellationToken).ConfigureAwait(false);
-            await _stream.WriteAsync(data, 0, data.Length, cancellationToken).ConfigureAwait(false);
+            if (obj == null)
+            {
+                await SendIntAsync(0, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                var data = SerializationHelper.SerializeObject(obj);
+                await SendIntAsync(data.Length, cancellationToken).ConfigureAwait(false);
+                await _stream.WriteAsync(data, 0, data.Length, cancellationToken).ConfigureAwait(false);
+            }
         }
 
         /// <summary>
@@ -59,13 +63,14 @@ namespace Outsorcery
         public async Task<object> ReceiveObjectAsync(CancellationToken cancellationToken)
         {
             var dataLength = await ReceiveIntAsync(cancellationToken).ConfigureAwait(false);
+
+            if (dataLength <= 0)
+            {
+                return null;
+            }
+
             var data = await ReadToLengthAsync(dataLength, cancellationToken).ConfigureAwait(false);
-
-            var obj = SerializationHelper.DeserializeObject(data);
-
-            return obj is NullRepresentation
-                ? null
-                : obj;
+            return SerializationHelper.DeserializeObject(data);
         }
 
         /// <summary>
@@ -147,14 +152,6 @@ namespace Outsorcery
             }
 
             return data;
-        }
-
-        /// <summary>
-        /// Object for representing null during sending
-        /// </summary>
-        [Serializable]
-        private class NullRepresentation
-        {
         }
     }
 }

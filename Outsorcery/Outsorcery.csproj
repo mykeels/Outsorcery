@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contract.cs" />
-    <Compile Include="IBenchmark.cs" />
+    <Compile Include="IWorkloadBenchmark.cs" />
     <Compile Include="IWorkItem.cs" />
     <Compile Include="IWorker.cs" />
     <Compile Include="IWorkerConnection.cs" />
@@ -49,7 +49,7 @@
     <Compile Include="RoundRobinTcpWorkerConnectionProvider.cs" />
     <Compile Include="LoadBalancedTcpWorkerConnectionProvider.cs" />
     <Compile Include="LocalWorker.cs" />
-    <Compile Include="SystemPerformanceWorkloadBenchmark.cs" />
+    <Compile Include="BasicCpuWorkloadBenchmark.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OutsourcedWorker.cs" />
     <Compile Include="SerializationHelper.cs" />

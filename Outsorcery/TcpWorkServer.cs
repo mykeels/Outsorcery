@@ -3,6 +3,7 @@
  */
 namespace Outsorcery
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -19,14 +20,14 @@ namespace Outsorcery
         private readonly IPEndPoint _localEndPoint;
 
         /// <summary>The benchmark for our current workload</summary>
-        private readonly IBenchmark _workloadBenchmark;
+        private readonly IWorkloadBenchmark _workloadBenchmark;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpWorkServer"/> class.
         /// </summary>
         /// <param name="localEndPoint">The local endpoint.</param>
         public TcpWorkServer(IPEndPoint localEndPoint)
-            : this(localEndPoint, new SystemPerformanceWorkloadBenchmark())
+            : this(localEndPoint, new BasicCpuWorkloadBenchmark())
         {
         }
 
@@ -35,7 +36,7 @@ namespace Outsorcery
         /// </summary>
         /// <param name="localEndPoint">The local endpoint.</param>
         /// <param name="workloadBenchmark">The benchmark which provides a score of our current workload.</param>
-        public TcpWorkServer(IPEndPoint localEndPoint, IBenchmark workloadBenchmark)
+        public TcpWorkServer(IPEndPoint localEndPoint, IWorkloadBenchmark workloadBenchmark)
         {
             Contract.IsNotNull(localEndPoint);
             Contract.IsNotNull(workloadBenchmark);
@@ -82,23 +83,25 @@ namespace Outsorcery
         {
             using (var connection = new StreamWorkerConnection(client.GetStream()))
             {
-                var benchmark = await _workloadBenchmark.GetScoreAsync().ConfigureAwait(false);
-
                 try
                 {
+                    // Get our benchmark for the provided work category
+                    var workCategoryId = await connection.ReceiveIntAsync(cancellationToken).ConfigureAwait(false);
+                    var benchmark = await _workloadBenchmark.GetScoreAsync(workCategoryId).ConfigureAwait(false);
+
                     // Send the client our benchmark, they'll use this to determine whether to use us for the work
                     await connection.SendIntAsync(benchmark, cancellationToken).ConfigureAwait(false);
                     
-                    // Try to receive work from the client, if they close the connection then we'll catch the exception...
+                    // Try to receive work from the client, if they close the connection then we'll catch the exception
                     dynamic workItem = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
 
-                    // ...do the work...
+                    // do the work
                     var result = await workItem.DoWorkAsync(cancellationToken).ConfigureAwait(false);
 
-                    // ...and send them the result.
+                    // Send the client the result
                     await connection.SendObjectAsync(result, cancellationToken).ConfigureAwait(false);
                 }
-                catch
+                catch (Exception)
                 {
                     // If anything bad happens to the connection just fail quietly.
                 }
