@@ -60,6 +60,27 @@ namespace Outsorcery.UnitTests
         }
 
         /// <summary>
+        /// Sends and receives object successfully test.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        [Test]
+        public async void SendsAndReceivesNullSuccessfully(
+            [ValueSource("OutsourcedWorkerConnections")]IWorkerConnection connection)
+        {
+            // Arrange
+            var ct = new CancellationToken();
+            TestStream.Position = 0; // To start from fresh
+
+            // Act
+            await connection.SendObjectAsync(null, ct).ConfigureAwait(false);
+            TestStream.Position = 0; // To read what we just wrote
+            var deserialized = await connection.ReceiveObjectAsync(ct).ConfigureAwait(false);
+
+            // Assert
+            Assert.That(deserialized, Is.EqualTo(null));
+        }
+
+        /// <summary>
         /// Test Serializable class
         /// </summary>
         [Serializable]

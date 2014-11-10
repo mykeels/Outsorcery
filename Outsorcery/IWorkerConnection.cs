@@ -26,5 +26,22 @@ namespace Outsorcery
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>An awaitable task, result is the received object.</returns>
         Task<object> ReceiveObjectAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Sends the integer asynchronously.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// An awaitable task.
+        /// </returns>
+        Task SendIntAsync(int value, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Receives the integer asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>An awaitable task, result is the received object.</returns>
+        Task<int> ReceiveIntAsync(CancellationToken cancellationToken);
     }
 }

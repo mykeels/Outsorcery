@@ -3,6 +3,7 @@
  */
 namespace Outsorcery
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -18,6 +19,23 @@ namespace Outsorcery
         /// <param name="workItem">The work item.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result.</returns>
-        Task<TResult> DoWorkAsync<TResult>(ISerializableWorkItem<TResult> workItem, CancellationToken cancellationToken);
+        Task<TResult> DoWorkAsync<TResult>(
+            ISerializableWorkItem<TResult> workItem, 
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Does the work asynchronously.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="workItem">The work item.</param>
+        /// <param name="timeout">The timeout.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// The result.
+        /// </returns>
+        Task<TResult> DoWorkAsync<TResult>(
+            ISerializableWorkItem<TResult> workItem, 
+            TimeSpan timeout,
+            CancellationToken cancellationToken);
     }
 }

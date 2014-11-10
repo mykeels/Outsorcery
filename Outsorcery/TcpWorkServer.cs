@@ -18,15 +18,30 @@ namespace Outsorcery
         /// <summary>The local endpoint</summary>
         private readonly IPEndPoint _localEndPoint;
 
+        /// <summary>The benchmark for our current workload</summary>
+        private readonly IBenchmark _workloadBenchmark;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpWorkServer"/> class.
         /// </summary>
         /// <param name="localEndPoint">The local endpoint.</param>
         public TcpWorkServer(IPEndPoint localEndPoint)
+            : this(localEndPoint, new SystemPerformanceWorkloadBenchmark())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TcpWorkServer" /> class.
+        /// </summary>
+        /// <param name="localEndPoint">The local endpoint.</param>
+        /// <param name="workloadBenchmark">The benchmark which provides a score of our current workload.</param>
+        public TcpWorkServer(IPEndPoint localEndPoint, IBenchmark workloadBenchmark)
         {
             Contract.IsNotNull(localEndPoint);
+            Contract.IsNotNull(workloadBenchmark);
 
             _localEndPoint = localEndPoint;
+            _workloadBenchmark = workloadBenchmark;
         }
 
         /// <summary>
@@ -63,21 +78,27 @@ namespace Outsorcery
         /// <param name="client">The client.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>An awaitable task.</returns>
-        private static async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
+        private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
         {
             using (var connection = new StreamWorkerConnection(client.GetStream()))
             {
+                var benchmark = await _workloadBenchmark.GetScoreAsync().ConfigureAwait(false);
+
                 try
                 {
-                    // SL: Not overly keen on using dynamic here, but it seems to be the only way we can
-                    //     cleanly support any TResult we want in 
+                    // Send the client our benchmark, they'll use this to determine whether to use us for the work
+                    await connection.SendIntAsync(benchmark, cancellationToken).ConfigureAwait(false);
+                    
+                    // Try to receive work from the client, if they close the connection then we'll catch the exception...
                     dynamic workItem = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
 
+                    // ...do the work...
                     var result = await workItem.DoWorkAsync(cancellationToken).ConfigureAwait(false);
 
+                    // ...and send them the result.
                     await connection.SendObjectAsync(result, cancellationToken).ConfigureAwait(false);
                 }
-                catch (SocketException)
+                catch
                 {
                     // If anything bad happens to the connection just fail quietly.
                 }

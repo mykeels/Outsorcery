@@ -41,17 +41,11 @@ namespace Outsorcery
         /// <exception cref="System.InvalidOperationException">Invalid header size</exception>
         public async Task SendObjectAsync(object obj, CancellationToken cancellationToken)
         {
-            Contract.IsNotNull(obj);
+            obj = obj ?? new NullRepresentation();
 
             var data = SerializationHelper.SerializeObject(obj);
-            var headerBytes = BitConverter.GetBytes(data.Length);
 
-            if (headerBytes.Length != sizeof(int))
-            {
-                throw new InvalidOperationException("Invalid header size");
-            }
-
-            await _stream.WriteAsync(headerBytes, 0, sizeof(int), cancellationToken).ConfigureAwait(false);
+            await SendIntAsync(data.Length, cancellationToken).ConfigureAwait(false);
             await _stream.WriteAsync(data, 0, data.Length, cancellationToken).ConfigureAwait(false);
         }
 
@@ -64,12 +58,41 @@ namespace Outsorcery
         /// </returns>
         public async Task<object> ReceiveObjectAsync(CancellationToken cancellationToken)
         {
-            var headerBytes = await ReadToLengthAsync(sizeof(int), cancellationToken).ConfigureAwait(false);
-            
-            var dataLength = BitConverter.ToInt32(headerBytes, 0);
+            var dataLength = await ReceiveIntAsync(cancellationToken).ConfigureAwait(false);
             var data = await ReadToLengthAsync(dataLength, cancellationToken).ConfigureAwait(false);
 
-            return SerializationHelper.DeserializeObject(data);
+            var obj = SerializationHelper.DeserializeObject(data);
+
+            return obj is NullRepresentation
+                ? null
+                : obj;
+        }
+
+        /// <summary>
+        /// Sends the integer asynchronously.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// An awaitable task.
+        /// </returns>
+        public async Task SendIntAsync(int value, CancellationToken cancellationToken)
+        {
+            var intBytes = BitConverter.GetBytes(value);
+            await _stream.WriteAsync(intBytes, 0, sizeof(int), cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Receives the integer asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// An awaitable task, result is the received object.
+        /// </returns>
+        public async Task<int> ReceiveIntAsync(CancellationToken cancellationToken)
+        {
+            var intBytes = await ReadToLengthAsync(sizeof(int), cancellationToken).ConfigureAwait(false);
+            return BitConverter.ToInt32(intBytes, 0);
         }
         
         /// <summary>
@@ -124,6 +147,14 @@ namespace Outsorcery
             }
 
             return data;
+        }
+
+        /// <summary>
+        /// Object for representing null during sending
+        /// </summary>
+        [Serializable]
+        private class NullRepresentation
+        {
         }
     }
 }
