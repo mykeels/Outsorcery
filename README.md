@@ -46,15 +46,15 @@ To perform your work remotely you need a server application.  Adding the below S
 // SERVER APPLICATION
 // *** REMINDER - Add a reference to your work item library in the 
 //                server project or it won't know what it's receiving! ***
-var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); // Change this IP and Port as appropriate
+var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
 new TcpWorkServer(localEndPoint).Run(cancellationToken).Wait();
 ```
 
 ```csharp
 // CLIENT APPLICATION
 // Setup
-var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); // Change this IP and Port as appropriate
-var provider = new SingleTcpWorkerConnectionProvider(localEndPoint);
+var serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); 
+var provider = new SingleTcpWorkerConnectionProvider(serverEndPoint);
 var worker = new OutsourcedWorker(provider);
 
 // Work
