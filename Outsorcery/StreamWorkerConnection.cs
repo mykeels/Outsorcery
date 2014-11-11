@@ -146,6 +146,18 @@ namespace Outsorcery
                 _stream.Dispose();
             }
         }
+        
+        /// <summary>
+        /// Wraps the exception if not wrapped already.
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        /// <returns>A wrapped exception.</returns>
+        private static Exception WrapExceptionIfNotWrapped(Exception exception)
+        {
+            return exception is CommunicationException
+                ? exception
+                : new CommunicationException(exception);
+        }
 
         /// <summary>
         /// Asynchronously reads all bytes up to length.
@@ -178,18 +190,6 @@ namespace Outsorcery
             }
 
             return data;
-        }
-
-        /// <summary>
-        /// Wraps the exception if not wrapped already.
-        /// </summary>
-        /// <param name="exception">The exception.</param>
-        /// <returns>A wrapped exception.</returns>
-        private Exception WrapExceptionIfNotWrapped(Exception exception)
-        {
-            return exception is CommunicationException
-                ? exception
-                : (Exception)new CommunicationException(exception);
         }
     }
 }

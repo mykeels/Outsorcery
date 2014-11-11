@@ -3,7 +3,6 @@
  */
 namespace Outsorcery
 {
-    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -12,23 +11,20 @@ namespace Outsorcery
     /// Retrieves a connection from the provider, sends the work item,
     /// waits for the result, closes the connection and returns the result.
     /// </summary>
-    public class OutsourcedWorker : IWorker
+    public class OutsourcedWorker : WorkerBase
     {
         /// <summary>The connection prove provider</summary>
         private readonly IWorkerConnectionProvider _connectionProveProvider;
-
-        /// <summary>A value indicating whether exceptions should be suppressed</summary>
-        private readonly bool _suppressExceptions;
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="OutsourcedWorker" /> class.
         /// </summary>
         /// <param name="connectionProvider">The connection provider.</param>
         /// <param name="suppressExceptions">if set to <c>true</c> [suppress exceptions].</param>
         public OutsourcedWorker(IWorkerConnectionProvider connectionProvider, bool suppressExceptions)
-            : this(connectionProvider)
+            : base(suppressExceptions)
         {
-            _suppressExceptions = suppressExceptions;
+            _connectionProveProvider = connectionProvider;
         }
 
         /// <summary>
@@ -36,63 +32,8 @@ namespace Outsorcery
         /// </summary>
         /// <param name="connectionProvider">The connection provider.</param>
         public OutsourcedWorker(IWorkerConnectionProvider connectionProvider)
+            : this(connectionProvider, false)
         {
-            _connectionProveProvider = connectionProvider;
-        }
-
-        /// <summary>
-        /// Does the work asynchronously.
-        /// If suppress exceptions is set to <c>true</c>, in the eventuality of 
-        /// an exception the default value for TResult will be returned.
-        /// </summary>
-        /// <typeparam name="TResult">The type of the result.</typeparam>
-        /// <param name="workItem">The work item.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>
-        /// The result.
-        /// </returns>
-        public Task<TResult> DoWorkAsync<TResult>(
-                                        IWorkItem<TResult> workItem,
-                                        CancellationToken cancellationToken)
-        {
-            return DoWorkInternalAsync(workItem, cancellationToken);
-        }
-
-        /// <summary>
-        /// Does the work asynchronously.
-        /// If suppress exceptions is set to <c>true</c>, in the eventuality of 
-        /// an exception the default value for TResult will be returned.
-        /// </summary>
-        /// <typeparam name="TResult">The type of the result.</typeparam>
-        /// <param name="workItem">The work item.</param>
-        /// <param name="timeout">The timeout.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>
-        /// The result.
-        /// </returns>
-        public async Task<TResult> DoWorkAsync<TResult>(
-                                        IWorkItem<TResult> workItem, 
-                                        TimeSpan timeout, 
-                                        CancellationToken cancellationToken)
-        {
-            var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            var workTask = DoWorkInternalAsync(workItem, cancellationSource.Token);
-            var timeoutTask = Task.Delay(timeout, cancellationSource.Token);
-            var firstToComplete = await Task.WhenAny(workTask, timeoutTask).ConfigureAwait(false);
-
-            cancellationSource.Cancel();
-
-            var timeoutOccurred = timeoutTask == firstToComplete;
-
-            if (timeoutOccurred && !_suppressExceptions)
-            {
-                throw new TimeoutException(string.Format("Timed out after {0:#,##0.000}s", timeout.TotalSeconds));
-            }
-
-            return timeoutOccurred
-                    ? default(TResult)
-                    : workTask.Result;
         }
 
         /// <summary>
@@ -104,32 +45,20 @@ namespace Outsorcery
         /// <returns>
         /// The result.
         /// </returns>
-        private async Task<TResult> DoWorkInternalAsync<TResult>(
-                                        IWorkItem<TResult> workItem,
-                                        CancellationToken cancellationToken)
+        protected override async Task<TResult> DoWorkInternalAsync<TResult>(
+                                                IWorkItem<TResult> workItem,
+                                                CancellationToken cancellationToken)
         {
-            try
+            using (var connection = await _connectionProveProvider
+                                            .GetConnectionAsync(workItem.WorkCategoryId, cancellationToken)
+                                            .ConfigureAwait(false))
             {
-                using (var connection = await _connectionProveProvider
-                                                .GetConnectionAsync(workItem.WorkCategoryId, cancellationToken)
-                                                .ConfigureAwait(false))
-                {
-                    await connection.SendObjectAsync(workItem, cancellationToken).ConfigureAwait(false);
+                await connection.SendObjectAsync(workItem, cancellationToken).ConfigureAwait(false);
 
-                    var result = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
+                var result = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
 
-                    return (TResult)result;
-                }
+                return (TResult)result;
             }
-            catch
-            {
-                if (!_suppressExceptions)
-                {
-                    throw;
-                }
-            }
-
-            return default(TResult);
         }
     }
 }

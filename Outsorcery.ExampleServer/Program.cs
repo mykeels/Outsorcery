@@ -41,7 +41,7 @@ namespace Outsorcery.ExampleServer
             var server = new TcpWorkServer(LocalEndPoint);
 
             server.RemoteWorkException += 
-                (s, e) => Console.WriteLine("{0} - {1}", e.Exception.Message, e.Exception.InnerException.Message);
+                (s, e) => Console.WriteLine("Exception: {0} - {1}", e.Exception.Message, e.Exception.InnerException.Message);
                                     
             return server.Run(cancellationToken);
         }

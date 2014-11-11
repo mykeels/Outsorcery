@@ -6,16 +6,16 @@ namespace Outsorcery
     using System;
 
     /// <summary>
-    /// Remote work exception event arguments
+    /// Work exception event arguments
     /// </summary>
     [Serializable]
-    public class RemoteWorkExceptionEventArgs : EventArgs
+    public class WorkExceptionEventArgs : EventArgs
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RemoteWorkExceptionEventArgs"/> class.
+        /// Initializes a new instance of the <see cref="WorkExceptionEventArgs"/> class.
         /// </summary>
         /// <param name="exception">The exception.</param>
-        public RemoteWorkExceptionEventArgs(RemoteWorkException exception)
+        public WorkExceptionEventArgs(WorkException exception)
         {
             Exception = exception;
         }
@@ -26,6 +26,6 @@ namespace Outsorcery
         /// <value>
         /// The exception.
         /// </value>
-        public RemoteWorkException Exception { get; private set; }
+        public WorkException Exception { get; private set; }
     }
 }

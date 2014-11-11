@@ -6,18 +6,18 @@ namespace Outsorcery
     using System;
 
     /// <summary>
-    /// Represents errors that occur when processing work items received from a remote location.
+    /// Represents errors that occur when processing work items.
     /// </summary>
     [Serializable]
-    public class RemoteWorkException : Exception
+    public class WorkException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RemoteWorkException" /> class.
+        /// Initializes a new instance of the <see cref="WorkException" /> class.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="workItem">The work item.</param>
         /// <param name="inner">The inner.</param>
-        public RemoteWorkException(string message, object workItem, Exception inner)
+        public WorkException(string message, object workItem, Exception inner)
             : base(message, inner)
         {
             WorkItem = workItem;

@@ -55,7 +55,7 @@ namespace Outsorcery
 
             if (selectedConnection.WorkerConnection == null)
             {
-                throw new CommunicationException("Unable to get a connection", selectedConnection.Exception);
+                throw new CommunicationException("Unable to get a connection.", selectedConnection.Exception);
             }
 
             return selectedConnection.WorkerConnection;
@@ -87,7 +87,7 @@ namespace Outsorcery
                 await connection.SendIntAsync(workCategoryId, cancellationToken).ConfigureAwait(false);
                 var benchmark = await connection.ReceiveIntAsync(cancellationToken).ConfigureAwait(false);
                 
-                // Do our best to invoke a clean up operation if we've been cancelled
+                // If we've been cancelled, trigger a clean up
                 cancellationToken.ThrowIfCancellationRequested();
 
                 return new ConnectionResult(connection, benchmark);

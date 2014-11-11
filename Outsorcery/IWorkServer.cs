@@ -15,7 +15,7 @@ namespace Outsorcery
         /// <summary>
         /// Occurs when an exception causes a remote work operation to fail.
         /// </summary>
-        event EventHandler<RemoteWorkExceptionEventArgs> RemoteWorkException;
+        event EventHandler<WorkExceptionEventArgs> RemoteWorkException;
 
         /// <summary>
         /// Runs the work server until cancellation is requested.

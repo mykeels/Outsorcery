@@ -24,7 +24,8 @@ namespace Outsorcery
         private readonly IWorkloadBenchmark _workloadBenchmark;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TcpWorkServer"/> class.
+        /// Initializes a new instance of the <see cref="TcpWorkServer"/> class
+        /// using <see cref="BasicCpuWorkloadBenchmark"/> for its benchmark.
         /// </summary>
         /// <param name="localEndPoint">The local endpoint.</param>
         public TcpWorkServer(IPEndPoint localEndPoint)
@@ -49,7 +50,7 @@ namespace Outsorcery
         /// <summary>
         /// Occurs when an exception causes a remote work operation to fail.
         /// </summary>
-        public event EventHandler<RemoteWorkExceptionEventArgs> RemoteWorkException;
+        public event EventHandler<WorkExceptionEventArgs> RemoteWorkException;
 
         /// <summary>
         /// Runs the work server until cancellation is requested.
@@ -87,12 +88,12 @@ namespace Outsorcery
         /// <returns>An awaitable task.</returns>
         private async Task ProcessClientAsync(TcpClient client, CancellationToken cancellationToken)
         {
-            using (var connection = new StreamWorkerConnection(client.GetStream()))
-            {
-                IPEndPoint endpoint = null;
-                dynamic workItem = null;
+            IPEndPoint endpoint = null;
+            dynamic workItem = null;
 
-                try
+            try
+            {
+                using (var connection = new StreamWorkerConnection(client.GetStream()))
                 {
                     endpoint = (IPEndPoint)client.Client.RemoteEndPoint;
 
@@ -102,30 +103,30 @@ namespace Outsorcery
 
                     // Send the client our benchmark, they'll use this to determine whether to use us for the work
                     await connection.SendIntAsync(benchmark, cancellationToken).ConfigureAwait(false);
-                    
+
                     // Try to receive work from the client, if they close the connection then we'll catch the exception
                     workItem = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
-                    
+
                     // do the work
                     var result = await workItem.DoWorkAsync(cancellationToken).ConfigureAwait(false);
-                    
+
                     // Send the client the result
                     await connection.SendObjectAsync(result, cancellationToken).ConfigureAwait(false);
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                // Report then swallow any exceptions to prevent client issues bringing the server down
+                if (RemoteWorkException != null)
                 {
-                    // Report then swallow any exceptions to prevent client issues bringing the server down
-                    if (RemoteWorkException != null)
-                    {
-                        var message = string.Format(
-                                        "An exception occurred when processing TCP client {0}:{1}.",
-                                        endpoint != null ? endpoint.Address.ToString() : "????",
-                                        endpoint != null ? endpoint.Port.ToString(CultureInfo.InvariantCulture) : "????");
+                    var message = string.Format(
+                        "An exception occurred when processing TCP client {0}:{1}.",
+                        endpoint != null ? endpoint.Address.ToString() : "????",
+                        endpoint != null ? endpoint.Port.ToString(CultureInfo.InvariantCulture) : "????");
 
-                        var eventArgs = new RemoteWorkExceptionEventArgs(new RemoteWorkException(message, workItem, ex));
+                    var eventArgs = new WorkExceptionEventArgs(new WorkException(message, workItem, ex));
 
-                        RemoteWorkException(this, eventArgs);
-                    }
+                    RemoteWorkException(this, eventArgs);
                 }
             }
         }

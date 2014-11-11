@@ -3,7 +3,6 @@
  */
 namespace Outsorcery
 {
-    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -11,56 +10,39 @@ namespace Outsorcery
     /// Local worker.
     /// Performs the work in the local environment.
     /// </summary>
-    public class LocalWorker : IWorker
+    public class LocalWorker : WorkerBase
     {
         /// <summary>
-        /// Does the work asynchronously.
+        /// Initializes a new instance of the <see cref="LocalWorker"/> class.
         /// </summary>
-        /// <typeparam name="TResult">The type of the result.</typeparam>
-        /// <param name="workItem">The work item.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>
-        /// The result.
-        /// </returns>
-        public Task<TResult> DoWorkAsync<TResult>(
-                                        IWorkItem<TResult> workItem, 
-                                        CancellationToken cancellationToken)
+        /// <param name="suppressExceptions">if set to <c>true</c> [suppress exceptions].</param>
+        public LocalWorker(bool suppressExceptions)
+            : base(suppressExceptions)
         {
-            return workItem.DoWorkAsync(cancellationToken);
         }
 
         /// <summary>
-        /// Does the work asynchronously.
+        /// Initializes a new instance of the <see cref="LocalWorker"/> class.
+        /// </summary>
+        public LocalWorker()
+            : base(false)
+        {
+        }
+
+        /// <summary>
+        /// Does the work asynchronously - protected implementation.
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="workItem">The work item.</param>
-        /// <param name="timeout">The timeout.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
-        /// The result.
+        /// An awaitable task, result is TResult.
         /// </returns>
-        /// <exception cref="System.TimeoutException">DoWorkAsync timed out</exception>
-        public async Task<TResult> DoWorkAsync<TResult>(
-                                        IWorkItem<TResult> workItem, 
-                                        TimeSpan timeout,
-                                        CancellationToken cancellationToken)
+        protected override Task<TResult> DoWorkInternalAsync<TResult>(
+                                            IWorkItem<TResult> workItem, 
+                                            CancellationToken cancellationToken)
         {
-            var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            var workTask = DoWorkAsync(workItem, cancellationSource.Token);
-            var timeoutTask = Task.Delay(timeout, cancellationSource.Token);
-            var firstToComplete = await Task.WhenAny(workTask, timeoutTask).ConfigureAwait(false);
-
-            cancellationSource.Cancel();
-
-            var timeoutOccurred = timeoutTask == firstToComplete;
-
-            if (timeoutOccurred)
-            {
-                throw new TimeoutException(string.Format("DoWorkAsync timed out after {0:#,##0.000}s", timeout.TotalSeconds));
-            }
-
-            return workTask.Result;
+            return workItem.DoWorkAsync(cancellationToken);
         }
     }
 }
