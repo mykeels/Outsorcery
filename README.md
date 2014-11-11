@@ -49,7 +49,6 @@ To perform your work remotely you need a server application.  Adding the below S
 var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
 new TcpWorkServer(localEndPoint).Run(cancellationToken).Wait();
 
-
 // CLIENT APPLICATION
 // Setup
 var serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); 
