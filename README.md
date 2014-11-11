@@ -45,7 +45,8 @@ Getting started with distributed computing using Outsorcery has been designed to
 To be able to perform your work remotely, you'll need a server application.  Adding the below code to a new console application's Main() and a reference to your work item class library is all it takes.
 
 ```csharp
-// *** REMINDER - Add a reference to your work item library in the server project or it won't know what it's receiving! ***
+// *** REMINDER - Add a reference to your work item library in the 
+//                server project or it won't know what it's receiving! ***
 var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
 new TcpWorkServer(localEndPoint).Run(cancellationToken).Wait();
 ```
