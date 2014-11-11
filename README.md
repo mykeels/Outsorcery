@@ -30,11 +30,8 @@ Performing the Work Locally
 Local workers can be useful for testing or as a failsafe when the remote servers are unavailable.
 
 ```csharp
-// CLIENT
-// Setup
+// CLIENT APPLICATION
 var worker = new LocalWorker();
-
-// Work
 var workItem = new MyFirstWorkItem { TestValue = 11 };
 var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 ```
@@ -46,7 +43,7 @@ Getting started with distributed computing using Outsorcery has been designed to
 To perform your work remotely you need a server application.  Adding the below SERVER code to a new console application's Main() and a reference to your work item class library is all it takes.
 
 ```csharp
-// SERVER
+// SERVER APPLICATION
 // *** REMINDER - Add a reference to your work item library in the 
 //                server project or it won't know what it's receiving! ***
 var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); // Change this IP and Port as appropriate
@@ -54,7 +51,7 @@ new TcpWorkServer(localEndPoint).Run(cancellationToken).Wait();
 ```
 
 ```csharp
-// CLIENT
+// CLIENT APPLICATION
 // Setup
 var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); // Change this IP and Port as appropriate
 var provider = new SingleTcpWorkerConnectionProvider(localEndPoint);
