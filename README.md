@@ -49,8 +49,8 @@ new TcpWorkServer(localEndPoint).Run(cancellationToken).Wait();
 
 // CLIENT APPLICATION
 // Setup
-var serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); 
-var provider = new SingleTcpWorkerConnectionProvider(serverEndPoint);
+var remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); 
+var provider = new SingleTcpWorkerConnectionProvider(remoteEndPoint);
 var worker = new OutsourcedWorker(provider);
 
 // Work
