@@ -27,7 +27,7 @@ public class MyFirstWorkItem : IWorkItem<int>
 
 Performing Work Locally
 -----------------------
-Local workers can be useful for testing or as a failsafe when the remote servers are unavailable.
+Local workers can be useful for testing or as a failsafe when the work servers are unavailable.
 
 ```csharp
 // CLIENT APPLICATION
