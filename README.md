@@ -30,6 +30,7 @@ Performing the Work Locally
 Local workers can be useful for testing or as a failsafe when the remote servers are unavailable.
 
 ```csharp
+// CLIENT
 // Setup
 var worker = new LocalWorker();
 
@@ -40,20 +41,20 @@ var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 
 Performing the Work Remotely
 ----------------------------
-Getting started with distributed computing using Outsorcery has been designed to be as accessible as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are examples of a simple implementation.
+Getting started with distributed computing using Outsorcery has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are examples of a simple implementation.
 
-To perform your work remotely you need a server application.  Adding the below code to a new console application's Main() and a reference to your work item class library is all it takes.
+To perform your work remotely you need a server application.  Adding the below SERVER code to a new console application's Main() and a reference to your work item class library is all it takes.
 
 ```csharp
+// SERVER
 // *** REMINDER - Add a reference to your work item library in the 
 //                server project or it won't know what it's receiving! ***
 var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); // Change this IP and Port as appropriate
 new TcpWorkServer(localEndPoint).Run(cancellationToken).Wait();
 ```
 
-In your client application add a connection provider for telling the worker where to go and replace LocalWorker with OutsourcedWorker.
-
 ```csharp
+// CLIENT
 // Setup
 var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); // Change this IP and Port as appropriate
 var provider = new SingleTcpWorkerConnectionProvider(localEndPoint);
@@ -63,5 +64,4 @@ var worker = new OutsourcedWorker(provider);
 var workItem = new MyFirstWorkItem { TestValue = 11 };
 var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 ```
-
 
