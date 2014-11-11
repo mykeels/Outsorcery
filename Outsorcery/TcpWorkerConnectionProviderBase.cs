@@ -21,24 +21,21 @@ namespace Outsorcery
 
         /// <summary>The endpoints</summary>
         private readonly IList<IPEndPoint> _endPoints;
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TcpWorkerConnectionProviderBase" /> class.
-        /// </summary>
-        /// <param name="endPoint">The end point.</param>
-        protected TcpWorkerConnectionProviderBase(IPEndPoint endPoint)
-            : this(new List<IPEndPoint> { endPoint })
-        {
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpWorkerConnectionProviderBase" /> class.
         /// </summary>
         /// <param name="endPoints">The end points.</param>
+        /// <exception cref="System.ArgumentException">No provided endpoint should be null.</exception>
         protected TcpWorkerConnectionProviderBase(IEnumerable<IPEndPoint> endPoints)
         {
             Contract.IsNotNull(endPoints);
             Contract.IsNotEmpty(endPoints);
+
+            if (endPoints.Contains(null))
+            {
+                throw new ArgumentException("No provided endpoint should be null.");
+            }
 
             _endPoints = endPoints.ToList();
         }

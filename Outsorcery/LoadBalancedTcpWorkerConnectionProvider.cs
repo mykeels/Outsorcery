@@ -19,15 +19,6 @@ namespace Outsorcery
         /// <summary>
         /// Initializes a new instance of the <see cref="LoadBalancedTcpWorkerConnectionProvider"/> class.
         /// </summary>
-        /// <param name="endPoint">The end point.</param>
-        public LoadBalancedTcpWorkerConnectionProvider(IPEndPoint endPoint)
-            : base(endPoint)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LoadBalancedTcpWorkerConnectionProvider"/> class.
-        /// </summary>
         /// <param name="endPoints">The end points.</param>
         public LoadBalancedTcpWorkerConnectionProvider(IEnumerable<IPEndPoint> endPoints)
             : base(endPoints)

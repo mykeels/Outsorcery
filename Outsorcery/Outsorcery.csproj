@@ -46,6 +46,7 @@
     <Compile Include="IWorker.cs" />
     <Compile Include="IWorkerConnection.cs" />
     <Compile Include="IWorkerConnectionProvider.cs" />
+    <Compile Include="SingleTcpWorkerConnectionProvider.cs" />
     <Compile Include="RoundRobinTcpWorkerConnectionProvider.cs" />
     <Compile Include="LoadBalancedTcpWorkerConnectionProvider.cs" />
     <Compile Include="LocalWorker.cs" />

@@ -45,7 +45,8 @@ namespace Outsorcery.ExampleClient
 
             // Now we define a connection provider for all of our workers 
             // to use when they need a connection.
-            var provider = new RoundRobinTcpWorkerConnectionProvider(LocalEndPoint);
+            // TcpWorkerConnectionProviders are reusable and thread-safe.
+            var provider = new SingleTcpWorkerConnectionProvider(LocalEndPoint);
 
             // We then create a worker that will outsource the work for us. 
             // Outsourced workers are reusable and thread-safe.

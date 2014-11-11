@@ -23,15 +23,6 @@ namespace Outsorcery
         /// <summary>
         /// Initializes a new instance of the <see cref="RoundRobinTcpWorkerConnectionProvider"/> class.
         /// </summary>
-        /// <param name="endPoint">The end point.</param>
-        public RoundRobinTcpWorkerConnectionProvider(IPEndPoint endPoint)
-            : base(endPoint)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RoundRobinTcpWorkerConnectionProvider"/> class.
-        /// </summary>
         /// <param name="endPoints">The end points.</param>
         public RoundRobinTcpWorkerConnectionProvider(IEnumerable<IPEndPoint> endPoints)
             : base(endPoints)
