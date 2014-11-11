@@ -27,7 +27,7 @@ public class MyFirstWorkItem : IWorkItem<int>
 
 Performing the Work Locally
 ---------------------------
-To test your first work item locally use a LocalWorker.  LocalWorkers can be useful for testing or for falling back on when the remote servers are unavailable.
+LocalWorkers can be useful for testing or for falling back on when the remote servers are unavailable.
 
 ```csharp
 // Setup
