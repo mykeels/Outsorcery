@@ -48,9 +48,8 @@ To perform your work remotely you need a server application.  Adding the below S
 //                server project or it won't know what it's receiving! ***
 var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
 new TcpWorkServer(localEndPoint).Run(cancellationToken).Wait();
-```
 
-```csharp
+
 // CLIENT APPLICATION
 // Setup
 var serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); 
