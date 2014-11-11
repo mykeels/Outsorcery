@@ -1,8 +1,8 @@
 Outsorcery
 ==========
 
-Features
---------
+Introduction
+------------
 Outsorcery is a library for implementing [distributed computing](http://en.wikipedia.org/wiki/Distributed_computing) capabilities in your software.  It is scaleable, customisable and completely asynchronous.  While many distributed computing solutions expose the consuming code to the details of work distribution and messaging, Outsorcery has been built from the ground up to be used in the exact same way as a local async operation.
 
 Getting Started
