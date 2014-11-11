@@ -8,8 +8,7 @@ namespace Outsorcery
     using System.Threading.Tasks;
 
     /// <summary>
-    /// A quick-fix Workload Benchmark that uses CPU percentage
-    /// to determine how busy the system is.
+    /// A quick-fix Workload Benchmark that uses CPU percentage to determine how busy the system is.
     /// </summary>
     public class BasicCpuWorkloadBenchmark : IWorkloadBenchmark
     {

@@ -5,6 +5,7 @@ namespace Outsorcery
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
@@ -14,7 +15,7 @@ namespace Outsorcery
     /// <summary>
     /// TCP Network Work Server
     /// </summary>
-    public class TcpWorkServer
+    public class TcpWorkServer : IWorkServer
     {
         /// <summary>The local endpoint</summary>
         private readonly IPEndPoint _localEndPoint;
@@ -46,6 +47,11 @@ namespace Outsorcery
         }
 
         /// <summary>
+        /// Occurs when an exception causes a remote work operation to fail.
+        /// </summary>
+        public event EventHandler<RemoteWorkExceptionEventArgs> RemoteWorkException;
+
+        /// <summary>
         /// Runs the work server until cancellation is requested.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
@@ -64,7 +70,7 @@ namespace Outsorcery
                 var client = await Task.Run(() => listener.AcceptTcpClientAsync(), cancellationToken)
                                         .ConfigureAwait(false);
 
-                clientTasks.Add(HandleClientAsync(client, cancellationToken));
+                clientTasks.Add(ProcessClientAsync(client, cancellationToken));
 
                 // Prevent the list of unresolved client tasks getting unnecessarily large
                 clientTasks = clientTasks.Where(w => !w.IsCompleted).ToList();
@@ -74,17 +80,22 @@ namespace Outsorcery
         }
 
         /// <summary>
-        /// Handles the client's work item asynchronously.
+        /// Processes the client's connection and associated work item asynchronously.
         /// </summary>
         /// <param name="client">The client.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>An awaitable task.</returns>
-        private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
+        private async Task ProcessClientAsync(TcpClient client, CancellationToken cancellationToken)
         {
             using (var connection = new StreamWorkerConnection(client.GetStream()))
             {
+                IPEndPoint endpoint = null;
+                dynamic workItem = null;
+
                 try
                 {
+                    endpoint = (IPEndPoint)client.Client.RemoteEndPoint;
+
                     // Get our benchmark for the provided work category
                     var workCategoryId = await connection.ReceiveIntAsync(cancellationToken).ConfigureAwait(false);
                     var benchmark = await _workloadBenchmark.GetScoreAsync(workCategoryId).ConfigureAwait(false);
@@ -93,17 +104,28 @@ namespace Outsorcery
                     await connection.SendIntAsync(benchmark, cancellationToken).ConfigureAwait(false);
                     
                     // Try to receive work from the client, if they close the connection then we'll catch the exception
-                    dynamic workItem = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
-
+                    workItem = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
+                    
                     // do the work
                     var result = await workItem.DoWorkAsync(cancellationToken).ConfigureAwait(false);
-
+                    
                     // Send the client the result
                     await connection.SendObjectAsync(result, cancellationToken).ConfigureAwait(false);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // If anything bad happens to the connection just fail quietly.
+                    // Report then swallow any exceptions to prevent client issues bringing the server down
+                    if (RemoteWorkException != null)
+                    {
+                        var message = string.Format(
+                                        "An exception occurred when processing TCP client {0}:{1}.",
+                                        endpoint != null ? endpoint.Address.ToString() : "????",
+                                        endpoint != null ? endpoint.Port.ToString(CultureInfo.InvariantCulture) : "????");
+
+                        var eventArgs = new RemoteWorkExceptionEventArgs(new RemoteWorkException(message, workItem, ex));
+
+                        RemoteWorkException(this, eventArgs);
+                    }
                 }
             }
         }

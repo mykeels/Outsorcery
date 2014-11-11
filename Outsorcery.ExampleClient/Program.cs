@@ -13,8 +13,8 @@ namespace Outsorcery.ExampleClient
     /// <summary>The program</summary>
     public class Program
     {
-        /// <summary>The local end point for demonstration purposes</summary>
-        private static readonly IPEndPoint LocalEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
+        /// <summary>The remote end point for demonstration purposes</summary>
+        private static readonly IPEndPoint RemoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
 
         /// <summary>The console application entry point.</summary>
         public static void Main()
@@ -46,7 +46,7 @@ namespace Outsorcery.ExampleClient
             // Now we define a connection provider for all of our workers 
             // to use when they need a connection.
             // TcpWorkerConnectionProviders are reusable and thread-safe.
-            var provider = new SingleTcpWorkerConnectionProvider(LocalEndPoint);
+            var provider = new SingleTcpWorkerConnectionProvider(RemoteEndPoint);
 
             // We then create a worker that will outsource the work for us. 
             // Outsourced workers are reusable and thread-safe.

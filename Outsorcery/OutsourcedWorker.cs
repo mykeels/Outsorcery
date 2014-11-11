@@ -87,7 +87,7 @@ namespace Outsorcery
 
             if (timeoutOccurred && !_suppressExceptions)
             {
-                throw new TimeoutException(string.Format("DoWorkAsync timed out after {0:#,##0.000}s", timeout.TotalSeconds));
+                throw new TimeoutException(string.Format("Timed out after {0:#,##0.000}s", timeout.TotalSeconds));
             }
 
             return timeoutOccurred
