@@ -25,8 +25,8 @@ public class MyFirstWorkItem : IWorkItem<int>
 }            
 ```
 
-Performing the Work Locally
----------------------------
+Performing Work Locally
+-----------------------
 Local workers can be useful for testing or as a failsafe when the remote servers are unavailable.
 
 ```csharp
@@ -36,8 +36,8 @@ var workItem = new MyFirstWorkItem { TestValue = 11 };
 var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 ```
 
-Performing the Work Remotely
-----------------------------
+Performing Work Remotely
+------------------------
 Getting started with distributed computing using Outsorcery has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are examples of a simple implementation.
 
 To perform your work remotely you need a server application.  Adding the below SERVER code to a new console application's Main() and a reference to your work item class library is all it takes.
