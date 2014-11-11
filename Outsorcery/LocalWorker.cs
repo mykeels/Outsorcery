@@ -23,7 +23,7 @@ namespace Outsorcery
         /// The result.
         /// </returns>
         public Task<TResult> DoWorkAsync<TResult>(
-                                        ISerializableWorkItem<TResult> workItem, 
+                                        IWorkItem<TResult> workItem, 
                                         CancellationToken cancellationToken)
         {
             return workItem.DoWorkAsync(cancellationToken);
@@ -41,7 +41,7 @@ namespace Outsorcery
         /// </returns>
         /// <exception cref="System.TimeoutException">DoWorkAsync timed out</exception>
         public async Task<TResult> DoWorkAsync<TResult>(
-                                        ISerializableWorkItem<TResult> workItem, 
+                                        IWorkItem<TResult> workItem, 
                                         TimeSpan timeout,
                                         CancellationToken cancellationToken)
         {

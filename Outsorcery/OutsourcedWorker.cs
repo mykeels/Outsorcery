@@ -52,7 +52,7 @@ namespace Outsorcery
         /// The result.
         /// </returns>
         public Task<TResult> DoWorkAsync<TResult>(
-                                        ISerializableWorkItem<TResult> workItem,
+                                        IWorkItem<TResult> workItem,
                                         CancellationToken cancellationToken)
         {
             return DoWorkInternalAsync(workItem, cancellationToken);
@@ -71,7 +71,7 @@ namespace Outsorcery
         /// The result.
         /// </returns>
         public async Task<TResult> DoWorkAsync<TResult>(
-                                        ISerializableWorkItem<TResult> workItem, 
+                                        IWorkItem<TResult> workItem, 
                                         TimeSpan timeout, 
                                         CancellationToken cancellationToken)
         {
@@ -105,7 +105,7 @@ namespace Outsorcery
         /// The result.
         /// </returns>
         private async Task<TResult> DoWorkInternalAsync<TResult>(
-                                        ISerializableWorkItem<TResult> workItem,
+                                        IWorkItem<TResult> workItem,
                                         CancellationToken cancellationToken)
         {
             try

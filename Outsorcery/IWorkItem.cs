@@ -10,7 +10,7 @@ namespace Outsorcery
     /// Work item interface. Implementations must be serializable.
     /// </summary>
     /// <typeparam name="TResult">The Type of the work item's result.</typeparam>
-    public interface ISerializableWorkItem<TResult>
+    public interface IWorkItem<TResult>
     {
         /// <summary>
         /// Gets the work category identifier for this work item.

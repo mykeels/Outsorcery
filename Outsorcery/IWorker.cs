@@ -20,7 +20,7 @@ namespace Outsorcery
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result.</returns>
         Task<TResult> DoWorkAsync<TResult>(
-            ISerializableWorkItem<TResult> workItem, 
+            IWorkItem<TResult> workItem, 
             CancellationToken cancellationToken);
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Outsorcery
         /// The result.
         /// </returns>
         Task<TResult> DoWorkAsync<TResult>(
-            ISerializableWorkItem<TResult> workItem, 
+            IWorkItem<TResult> workItem, 
             TimeSpan timeout,
             CancellationToken cancellationToken);
     }

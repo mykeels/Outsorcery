@@ -11,7 +11,7 @@ namespace Outsorcery.ExampleWorkItems
     /// An example work item
     /// </summary>
     [Serializable]
-    public class ExampleWorkItem : ISerializableWorkItem<ExampleWorkResult>
+    public class ExampleWorkItem : IWorkItem<ExampleWorkResult>
     {
         /// <summary>
         /// Gets or sets the example list.
