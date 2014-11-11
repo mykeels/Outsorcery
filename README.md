@@ -58,3 +58,6 @@ var workItem = new MyFirstWorkItem { TestValue = 11 };
 var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 ```
 
+Load Balancing
+--------------
+Documentation coming soon!
