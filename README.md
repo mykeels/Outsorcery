@@ -61,3 +61,7 @@ var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 Load Balancing
 --------------
 Documentation coming soon!
+
+Error Handling
+--------------
+Documentation coming soon!
