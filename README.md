@@ -41,10 +41,6 @@ Do Work Remotely
 Remote Workers distribute the work to one or more servers for completion. Distributed computing using Outsorcery's Remote Workers has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a fully functioning example.
 
 ```csharp
-// SERVER APPLICATION
-// *** REMINDER - Add a reference to your work item library in the 
-//                server project or it won't know what it's receiving! ***
-var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
 new TcpWorkServer(localEndPoint).Run(cancellationToken).Wait();
 
 // CLIENT APPLICATION
@@ -56,6 +52,12 @@ var worker = new OutsourcedWorker(provider);
 // Work
 var workItem = new MyFirstWorkItem { TestValue = 11 };
 var result = await worker.DoWorkAsync(workItem, new CancellationToken());
+
+// SERVER APPLICATION
+// *** REMINDER - Add a reference to your work item library in the 
+//                server project or it won't know what it's receiving! ***
+var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
+
 ```
 
 Load Balancing
