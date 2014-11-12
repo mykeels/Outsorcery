@@ -5,6 +5,8 @@ Introduction
 ------------
 Outsorcery is an open-source library for adding [distributed computing](http://en.wikipedia.org/wiki/Distributed_computing) capabilities to your software.  It is scalable, customisable and asynchronous.  While many distributed computing solutions expose the consuming code to the details of work distribution to some degree, Outsorcery has been built from the ground up to be used in the same way as any local async method.
 
+[You can now get Outsorcery on NuGet](https://www.nuget.org/packages/Outsorcery/)
+
 Getting Started
 ---------------
 The first thing to do when getting started with Outsorcery is define a unit of distributable work. The only requirements are that it implements IWorkItem< TResult > and that it is Serializable.  You should put all your work items into a class library so that the server and client projects can reference them.
