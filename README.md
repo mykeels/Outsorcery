@@ -91,7 +91,7 @@ var worker = new RemoteWorker(provider);
 worker.WorkException += MyWorkerOnWorkExceptionHandler;
 ```
 
-WorkServers suppress all exceptions encountered while processing work received from a client to prevent application failure. To receive notification when these exceptions occur subscribe to the RemoteWorkException event.
+Work Servers suppress all exceptions encountered while processing work received from a client to prevent application failure. To receive notification when these exceptions occur subscribe to the RemoteWorkException event.
 
 ```csharp
 // SERVER
