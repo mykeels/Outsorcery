@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RetryWorker.cs" />
     <Compile Include="WorkerBase.cs" />
     <Compile Include="WorkException.cs" />
     <Compile Include="CommunicationException.cs" />

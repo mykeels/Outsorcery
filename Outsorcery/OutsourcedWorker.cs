@@ -15,17 +15,6 @@ namespace Outsorcery
     {
         /// <summary>The connection prove provider</summary>
         private readonly IWorkerConnectionProvider _connectionProveProvider;
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OutsourcedWorker" /> class.
-        /// </summary>
-        /// <param name="connectionProvider">The connection provider.</param>
-        /// <param name="suppressExceptions">if set to <c>true</c> [suppress exceptions].</param>
-        public OutsourcedWorker(IWorkerConnectionProvider connectionProvider, bool suppressExceptions)
-            : base(suppressExceptions)
-        {
-            _connectionProveProvider = connectionProvider;
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OutsourcedWorker"/> class.
@@ -36,6 +25,17 @@ namespace Outsorcery
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OutsourcedWorker" /> class.
+        /// </summary>
+        /// <param name="connectionProvider">The connection provider.</param>
+        /// <param name="suppressExceptions">if set to <c>true</c> [suppress exceptions].</param>
+        public OutsourcedWorker(IWorkerConnectionProvider connectionProvider, bool suppressExceptions)
+            : base(suppressExceptions)
+        {
+            _connectionProveProvider = connectionProvider;
+        }
+        
         /// <summary>
         /// Internal DoWork method.
         /// </summary>

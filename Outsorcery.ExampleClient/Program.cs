@@ -50,7 +50,7 @@ namespace Outsorcery.ExampleClient
 
             // We then create a worker that will outsource the work for us. 
             // Outsourced workers are reusable and thread-safe.
-            var worker = new OutsourcedWorker(provider);
+            var worker = new RetryWorker(new OutsourcedWorker(provider), 3);
 
             // In exactly the same way as we would when not outsourcing the work,
             // we await the result of the operation.
