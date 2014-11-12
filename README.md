@@ -27,7 +27,7 @@ public class MyFirstWorkItem : IWorkItem<int>
 
 Do Work Locally
 ---------------
-Local workers can be useful for testing or as a failsafe when the work servers are unavailable.
+Local Workers can be useful for testing or as a failsafe when the work servers are unavailable.
 
 ```csharp
 // CLIENT APPLICATION
@@ -38,7 +38,7 @@ var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 
 Do Work Remotely
 ----------------
-Getting started with distributed computing using Outsorcery has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a working example of basic usage.
+Remote Workers distribute the work to one or more servers for completion. Getting started with distributed computing using Outsorcery's Remote Workers has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a fully functioning example.
 
 ```csharp
 // SERVER APPLICATION
