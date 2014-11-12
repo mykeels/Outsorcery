@@ -83,6 +83,14 @@ new TcpWorkServer(localEndPoint, customBenchmark).Run(cancellationToken).Wait();
 
 Exception Handling
 --------------
+Workers throw exceptions by default but you can suppress this behaviour by using the appropriate overloaded constructor.  When exceptions are suppressed and an exception occurs, a Worker returns the default value for TResult instead of throwing the exception.  To receive notification when these exceptions occur, subscribe to the WorkException event.
+
+```csharp
+// CLIENT
+var worker = new RemoteWorker(provider);
+worker.WorkException += MyWorkerOnWorkExceptionHandler;
+```
+
 WorkServers suppress all exceptions encountered while processing work received from a client to prevent application failure. To receive notification when these exceptions occur subscribe to the RemoteWorkException event.
 
 ```csharp
@@ -91,10 +99,3 @@ var server = new TcpWorkServer(localEndPoint);
 server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
 ```
 
-Workers throw exceptions by default but you can suppress this behaviour by using the appropriate overloaded constructor.  When exceptions are suppressed and an exception occurs, a Worker returns the default value for TResult instead of throwing the exception.  To receive notification when these exceptions occur, subscribe to the WorkException event.
-
-```csharp
-// CLIENT
-var worker = new RemoteWorker(provider);
-worker.WorkException += MyWorkerOnWorkExceptionHandler;
-```
