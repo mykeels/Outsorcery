@@ -13,46 +13,33 @@ namespace Outsorcery.ExampleServer
     /// </summary>
     public class Program
     {
-        /// <summary>The local end point for demonstration purposes</summary>
-        private static readonly IPEndPoint LocalEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
-
         /// <summary>
         /// The console application entry point.
         /// </summary>
         public static void Main()
         {
-            BasicUsageExample(new CancellationToken()).Wait();
+            UsageExample(new CancellationToken()).Wait();
         }
 
         /// <summary>
-        /// An example of the most basic usage of the server.
+        /// An example of the usage of the server.
         /// When implementing your own, don't forget to reference your work item library
         /// in the server project.
-        /// The server needs it to understand the client requests and do the work!
+        /// The server needs it to understand the client requests to do the work!
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
         /// An awaitable task.
         /// </returns>
-        public static Task BasicUsageExample(CancellationToken cancellationToken)
+        public static Task UsageExample(CancellationToken cancellationToken)
         {
-            WriteHeader("Basic Server Example");
-
-            var server = new TcpWorkServer(LocalEndPoint);
+            var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
+            var server = new TcpWorkServer(localEndPoint);
 
             server.RemoteWorkException += 
                 (s, e) => Console.WriteLine("Exception: {0} - {1}", e.Exception.Message, e.Exception.InnerException.Message);
                                     
             return server.Run(cancellationToken);
-        }
-
-        /// <summary>Writes the header.</summary>
-        /// <param name="header">The header.</param>
-        public static void WriteHeader(string header)
-        {
-            Console.WriteLine("====================");
-            Console.WriteLine(header);
-            Console.WriteLine("====================");
         }
     }
 }
