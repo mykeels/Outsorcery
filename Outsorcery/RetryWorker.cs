@@ -40,6 +40,20 @@ namespace Outsorcery
         /// </summary>
         /// <param name="internalWorker">The internal worker.</param>
         /// <param name="numberOfAttempts">The number of attempts to make.</param>
+        /// <param name="delayBetweenAttempts">The delay between attempts.</param>
+        public RetryWorker(
+                    IWorker internalWorker,
+                    int numberOfAttempts,
+                    TimeSpan delayBetweenAttempts)
+            : this(internalWorker, numberOfAttempts, delayBetweenAttempts, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RetryWorker" /> class.
+        /// </summary>
+        /// <param name="internalWorker">The internal worker.</param>
+        /// <param name="numberOfAttempts">The number of attempts to make.</param>
         /// <param name="suppressExceptions">if set to <c>true</c> [suppress exceptions].</param>
         public RetryWorker(
                     IWorker internalWorker,
