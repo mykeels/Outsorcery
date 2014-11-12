@@ -64,7 +64,7 @@ Load Balancing
 Distributes work items evenly across all end points.
 
 ```csharp
-// CLIENT
+// CLIENT APPLICATION
 var endPoints = new List<IPEndPoint> { remoteEndPoint1, remoteEndPoint2, ... };
 var provider = new RoundRobinTcpWorkerConnectionProvider(endPoints);
 ```
@@ -73,15 +73,29 @@ var provider = new RoundRobinTcpWorkerConnectionProvider(endPoints);
 Distributes work items to the server that reports having the lowest workload. You can customise the server's response by providing a custom implementation of IWorkloadBenchmark to the server constructor.
 
 ```csharp
-// CLIENT
+// CLIENT APPLICATION
 var endPoints = new List<IPEndPoint> { remoteEndPoint1, remoteEndPoint2, ... };
 var provider = new LoadBalancedTcpWorkerConnectionProvider(endPoints);
 
-// SERVER
+// SERVER APPLICATION
 var customBenchmark = new MyCustomWorkloadBenchmark();
 new TcpWorkServer(localEndPoint, customBenchmark).Run(cancellationToken).Wait();
 ```
 
-Error Handling
+Exception Handling
 --------------
-Documentation coming soon!
+WorkServers suppress all exceptions encountered while processing work received from a client to prevent application failure. To receive notification when these exceptions occur, subscribe to the RemoteWorkException event.
+
+```csharp
+// SERVER
+var server = new TcpWorkServer(localEndPoint);
+server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
+```
+
+Workers throw exceptions by default, but you can suppress this behaviour by using the appropriate overloaded constructor.  When exceptions are suppressed and an exception occurs, a Worker returns the default value for TResult instead of throwing an exception.  To be receive notification when these exceptions occur, subscribe to the WorkException event.
+
+```csharp
+// CLIENT
+var worker = new RemoteWorker(provider);
+worker.WorkException += MyWorkerOnWorkExceptionHandler;
+```
