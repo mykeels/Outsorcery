@@ -65,7 +65,7 @@ Distributes work items evenly across all end points.
 
 ```csharp
 // CLIENT
-var endPoints = new List<IPEndPoint> { remoteEndPoint1, remoteEndPoint2, remoteEndPoint3, ... };
+var endPoints = new List<IPEndPoint> { remoteEndPoint1, remoteEndPoint2, ... };
 var provider = new RoundRobinTcpWorkerConnectionProvider(endPoints);
 ```
 
@@ -74,7 +74,7 @@ Distributes work items to the server that reports having the lowest workload. Yo
 
 ```csharp
 // CLIENT
-var endPoints = new List<IPEndPoint> { remoteEndPoint1, remoteEndPoint2, remoteEndPoint3, ... };
+var endPoints = new List<IPEndPoint> { remoteEndPoint1, remoteEndPoint2, ... };
 var provider = new LoadBalancedTcpWorkerConnectionProvider(endPoints);
 
 // SERVER
