@@ -1,11 +1,10 @@
 Outsorcery
 ==========
+[You can now get Outsorcery on NuGet](https://www.nuget.org/packages/Outsorcery/)
 
 Introduction
 ------------
 Outsorcery is an open-source library for adding [distributed computing](http://en.wikipedia.org/wiki/Distributed_computing) capabilities to your software.  It is scalable, customisable and asynchronous.  While many distributed computing solutions expose the consuming code to the details of work distribution to some degree, Outsorcery has been built from the ground up to be used in the same way as any local async method.
-
-[You can now get Outsorcery on NuGet](https://www.nuget.org/packages/Outsorcery/)
 
 Getting Started
 ---------------
