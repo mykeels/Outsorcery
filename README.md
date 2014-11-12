@@ -38,7 +38,7 @@ var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 
 Do Work Remotely
 ----------------
-Getting started with distributed computing using Outsorcery has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a working example of a starter implementation.
+Getting started with distributed computing using Outsorcery has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a working example of basic usage.
 
 ```csharp
 // SERVER APPLICATION
@@ -49,8 +49,8 @@ new TcpWorkServer(localEndPoint).Run(cancellationToken).Wait();
 
 // CLIENT APPLICATION
 // Setup
-var serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); 
-var provider = new SingleTcpWorkerConnectionProvider(serverEndPoint);
+var remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444); 
+var provider = new SingleTcpWorkerConnectionProvider(remoteEndPoint);
 var worker = new OutsourcedWorker(provider);
 
 // Work
@@ -59,5 +59,9 @@ var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 ```
 
 Load Balancing
+--------------
+Documentation coming soon!
+
+Error Handling
 --------------
 Documentation coming soon!

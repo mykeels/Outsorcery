@@ -34,18 +34,19 @@ namespace Outsorcery.ExampleServer
         /// <returns>
         /// An awaitable task.
         /// </returns>
-        public static async Task BasicUsageExample(CancellationToken cancellationToken)
+        public static Task BasicUsageExample(CancellationToken cancellationToken)
         {
             WriteHeader("Basic Server Example");
 
-            await new TcpWorkServer(LocalEndPoint)
-                                    .Run(cancellationToken)
-                                    .ConfigureAwait(false);
+            var server = new TcpWorkServer(LocalEndPoint);
+
+            server.RemoteWorkException += 
+                (s, e) => Console.WriteLine("Exception: {0} - {1}", e.Exception.Message, e.Exception.InnerException.Message);
+                                    
+            return server.Run(cancellationToken);
         }
 
-        /// <summary>
-        /// Writes the header.
-        /// </summary>
+        /// <summary>Writes the header.</summary>
         /// <param name="header">The header.</param>
         public static void WriteHeader(string header)
         {

@@ -13,6 +13,11 @@ namespace Outsorcery
     public interface IWorker
     {
         /// <summary>
+        /// Occurs when an exception causes a work operation to fail.
+        /// </summary>
+        event EventHandler<WorkExceptionEventArgs> WorkException;
+
+        /// <summary>
         /// Does the work asynchronously.
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>

@@ -26,7 +26,6 @@ namespace Outsorcery
         public StreamWorkerConnection(Stream stream)
         {
             Contract.IsNotNull(stream);
-
             _stream = stream;
         }
 
@@ -38,18 +37,24 @@ namespace Outsorcery
         /// <returns>
         /// An awaitable task.
         /// </returns>
-        /// <exception cref="System.InvalidOperationException">Invalid header size</exception>
         public async Task SendObjectAsync(object obj, CancellationToken cancellationToken)
         {
-            if (obj == null)
+            try
             {
-                await SendIntAsync(0, cancellationToken).ConfigureAwait(false);
+                if (obj == null)
+                {
+                    await SendIntAsync(0, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    var data = SerializationHelper.SerializeObject(obj);
+                    await SendIntAsync(data.Length, cancellationToken).ConfigureAwait(false);
+                    await _stream.WriteAsync(data, 0, data.Length, cancellationToken).ConfigureAwait(false);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var data = SerializationHelper.SerializeObject(obj);
-                await SendIntAsync(data.Length, cancellationToken).ConfigureAwait(false);
-                await _stream.WriteAsync(data, 0, data.Length, cancellationToken).ConfigureAwait(false);
+                throw WrapExceptionIfNotWrapped(ex);
             }
         }
 
@@ -62,15 +67,22 @@ namespace Outsorcery
         /// </returns>
         public async Task<object> ReceiveObjectAsync(CancellationToken cancellationToken)
         {
-            var dataLength = await ReceiveIntAsync(cancellationToken).ConfigureAwait(false);
-
-            if (dataLength <= 0)
+            try
             {
-                return null;
-            }
+                var dataLength = await ReceiveIntAsync(cancellationToken).ConfigureAwait(false);
 
-            var data = await ReadToLengthAsync(dataLength, cancellationToken).ConfigureAwait(false);
-            return SerializationHelper.DeserializeObject(data);
+                if (dataLength <= 0)
+                {
+                    return null;
+                }
+
+                var data = await ReadToLengthAsync(dataLength, cancellationToken).ConfigureAwait(false);
+                return SerializationHelper.DeserializeObject(data);
+            }
+            catch (Exception ex)
+            {
+                throw WrapExceptionIfNotWrapped(ex);
+            }
         }
 
         /// <summary>
@@ -83,8 +95,15 @@ namespace Outsorcery
         /// </returns>
         public async Task SendIntAsync(int value, CancellationToken cancellationToken)
         {
-            var intBytes = BitConverter.GetBytes(value);
-            await _stream.WriteAsync(intBytes, 0, sizeof(int), cancellationToken).ConfigureAwait(false);
+            try
+            {
+                var intBytes = BitConverter.GetBytes(value);
+                await _stream.WriteAsync(intBytes, 0, sizeof(int), cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw WrapExceptionIfNotWrapped(ex);
+            }
         }
 
         /// <summary>
@@ -96,8 +115,15 @@ namespace Outsorcery
         /// </returns>
         public async Task<int> ReceiveIntAsync(CancellationToken cancellationToken)
         {
-            var intBytes = await ReadToLengthAsync(sizeof(int), cancellationToken).ConfigureAwait(false);
-            return BitConverter.ToInt32(intBytes, 0);
+            try
+            {
+                var intBytes = await ReadToLengthAsync(sizeof(int), cancellationToken).ConfigureAwait(false);
+                return BitConverter.ToInt32(intBytes, 0);
+            }
+            catch (Exception ex)
+            {
+                throw WrapExceptionIfNotWrapped(ex);
+            }
         }
         
         /// <summary>
@@ -119,6 +145,18 @@ namespace Outsorcery
             {
                 _stream.Dispose();
             }
+        }
+        
+        /// <summary>
+        /// Wraps the exception if not wrapped already.
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        /// <returns>A wrapped exception.</returns>
+        private static Exception WrapExceptionIfNotWrapped(Exception exception)
+        {
+            return exception is CommunicationException
+                ? exception
+                : new CommunicationException(exception);
         }
 
         /// <summary>
