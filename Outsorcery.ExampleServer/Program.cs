@@ -8,14 +8,10 @@ namespace Outsorcery.ExampleServer
     using System.Threading;
     using System.Threading.Tasks;
 
-    /// <summary>
-    /// The program.
-    /// </summary>
+    /// <summary>The program.</summary>
     public class Program
     {
-        /// <summary>
-        /// The console application entry point.
-        /// </summary>
+        /// <summary>The console application entry point.</summary>
         public static void Main()
         {
             UsageExample(new CancellationToken()).Wait();
@@ -23,9 +19,8 @@ namespace Outsorcery.ExampleServer
 
         /// <summary>
         /// An example of the usage of the server.
-        /// When implementing your own, don't forget to reference your work item library
-        /// in the server project.
-        /// The server needs it to understand the client requests to do the work!
+        /// When implementing your own, don't forget to reference your work item library in the 
+        /// server project. The server needs it to understand the client requests to do the work!
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>

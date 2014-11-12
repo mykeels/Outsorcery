@@ -1,13 +1,11 @@
 ﻿/*
     License: http://www.apache.org/licenses/LICENSE-2.0
  */
-
-using System.Globalization;
-
 namespace Outsorcery.ExampleClient
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Net;
     using System.Threading;
@@ -20,9 +18,9 @@ namespace Outsorcery.ExampleClient
         /// <summary>The console application entry point.</summary>
         public static void Main()
         {
-            // *** DON'T FORGET TO RUN THE SERVER FIRST! ***
-            // *** DON'T FORGET TO RUN THE SERVER FIRST! ***
-            // *** DON'T FORGET TO RUN THE SERVER FIRST! ***
+            // *** REMEMBER TO RUN THE SERVER FIRST! ***
+            // *** REMEMBER TO RUN THE SERVER FIRST! ***
+            // *** REMEMBER TO RUN THE SERVER FIRST! ***
             // ============================
             // SETUP
             // ============================
@@ -32,7 +30,7 @@ namespace Outsorcery.ExampleClient
 
             // We create a worker that will do the outsourcing for us. Workers are thread safe so can be shared.
             // The second parameter specifies whether we want the worker to suppress exceptions.
-            var worker = new OutsourcedWorker(provider, false);
+            var worker = new OutsourcedWorker(provider, true);
 
             // Log exceptions. This event is triggered even if exceptions are suppressed by the worker.
             worker.WorkException +=
