@@ -38,7 +38,7 @@ var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 
 Do Work Remotely
 ----------------
-Remote Workers distribute the work to one or more servers for completion. Getting started with distributed computing using Outsorcery's Remote Workers has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a fully functioning example.
+Remote Workers distribute the work to one or more servers for completion. Distributed computing using Outsorcery's Remote Workers has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a fully functioning example.
 
 ```csharp
 // SERVER APPLICATION
@@ -60,8 +60,7 @@ var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 
 Load Balancing
 --------------
-[Round Robin](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/RoundRobinTcpWorkerConnectionProvider.cs)
-Distributes work items evenly across all end points.
+[Round Robin](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/RoundRobinTcpWorkerConnectionProvider.cs) distributes each work item to a different server.
 
 ```csharp
 // CLIENT APPLICATION
@@ -69,8 +68,7 @@ var endPoints = new List<IPEndPoint> { remoteEndPoint1, remoteEndPoint2, ... };
 var provider = new RoundRobinTcpWorkerConnectionProvider(endPoints);
 ```
 
-[Load Balanced](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/LoadBalancedTcpWorkerConnectionProvider.cs)
-Distributes work items to the server that reports having the lowest workload. You can customise the server's response by providing a custom implementation of IWorkloadBenchmark to the server constructor.
+[Load Balanced](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/LoadBalancedTcpWorkerConnectionProvider.cs) distributes a work item to the server that reports having the lowest workload. You can customise the server's response by providing a custom implementation of IWorkloadBenchmark to the server constructor.
 
 ```csharp
 // CLIENT APPLICATION
@@ -84,7 +82,7 @@ new TcpWorkServer(localEndPoint, customBenchmark).Run(cancellationToken).Wait();
 
 Exception Handling
 --------------
-WorkServers suppress all exceptions encountered while processing work received from a client to prevent application failure. To receive notification when these exceptions occur, subscribe to the RemoteWorkException event.
+WorkServers suppress all exceptions encountered while processing work received from a client to prevent application failure. To receive notification when these exceptions occur subscribe to the RemoteWorkException event.
 
 ```csharp
 // SERVER
@@ -92,7 +90,7 @@ var server = new TcpWorkServer(localEndPoint);
 server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
 ```
 
-Workers throw exceptions by default, but you can suppress this behaviour by using the appropriate overloaded constructor.  When exceptions are suppressed and an exception occurs, a Worker returns the default value for TResult instead of throwing an exception.  To be receive notification when these exceptions occur, subscribe to the WorkException event.
+Workers throw exceptions by default but you can suppress this behaviour by using the appropriate overloaded constructor.  When exceptions are suppressed and an exception occurs, a Worker returns the default value for TResult instead of throwing the exception.  To receive notification when these exceptions occur, subscribe to the WorkException event.
 
 ```csharp
 // CLIENT
