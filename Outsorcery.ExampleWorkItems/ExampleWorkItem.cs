@@ -8,7 +8,9 @@ namespace Outsorcery.ExampleWorkItems
     using System.Threading.Tasks;
 
     /// <summary>
-    /// An example work item
+    /// An example work item - Waits 2 seconds during work to emulate a real scenario
+    /// The only requirements for a work item are that it implements 
+    /// IWorkItem and that it is serializable.
     /// </summary>
     [Serializable]
     public class ExampleWorkItem : IWorkItem<ExampleWorkResult>
@@ -40,15 +42,14 @@ namespace Outsorcery.ExampleWorkItems
         public async Task<ExampleWorkResult> DoWorkAsync(System.Threading.CancellationToken cancellationToken)
         {
             Console.WriteLine("Work started on this system");
+            
+            await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
 
             var result = new ExampleWorkResult
-                        {
-                            IntegerValue = new Random().Next(1000)
-                        };
-
-            await Task.Delay(100, cancellationToken).ConfigureAwait(false);
-
-            result.StringValue = string.Join(", ", ExampleList).ToUpper();
+            {
+                IntegerValue = new Random().Next(1000),
+                StringValue = string.Join(" ", ExampleList).ToUpper()
+            };
 
             Console.WriteLine(
                         "Work complete on this system, result - int: {0}. string: {1}.", 
