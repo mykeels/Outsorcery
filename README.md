@@ -78,7 +78,8 @@ var endPoints = new List<IPEndPoint> { remoteEndPoint1, remoteEndPoint2, ... };
 var provider = new LoadBalancedTcpWorkerConnectionProvider(endPoints);
 
 // SERVER
-new TcpWorkServer(localEndPoint, new MyCustomWorkloadBenchmark()).Run(cancellationToken).Wait();
+var customBenchmark = new MyCustomWorkloadBenchmark();
+new TcpWorkServer(localEndPoint, customBenchmark).Run(cancellationToken).Wait();
 ```
 
 Error Handling
