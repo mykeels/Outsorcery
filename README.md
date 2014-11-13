@@ -42,7 +42,7 @@ var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 
 Do Work Remotely
 ----------------
-[Outsourced Workers](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/OutsourcedWorker.cs) distribute the work to one or more servers for completion. Distributed computing using Outsorcery's Outsourced Workers has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a fully functioning example.
+[Outsourced Workers](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/OutsourcedWorker.cs) distribute the work to one or more servers for completion. Distributed computing using Outsourced Workers has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a fully functioning example.
 
 ```csharp
 // CLIENT APPLICATION
