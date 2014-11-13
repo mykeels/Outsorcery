@@ -101,10 +101,12 @@ You can suppress the first X exceptions that a Worker encounters and automatical
 var worker = new OutsourcedWorker(provider);
 
 // Manual creation
-var result = await new RetryWorker(worker, 2).DoWorkAsync(myWorkItem, cancellationToken);
+var result = await new RetryWorker(worker, 2)
+                            .DoWorkAsync(myWorkItem, cancellationToken);
 
 // Extension method
-var result = await worker.WithRetries(2).DoWorkAsync(myWorkItem, cancellationToken);
+var result = await worker.WithRetries(2)
+                            .DoWorkAsync(myWorkItem, cancellationToken);
 ```
 
 Work Servers suppress all exceptions they encounter while processing a client connection and its associated work. To receive notification when client related exceptions occur, subscribe to the RemoteWorkException event.
@@ -124,10 +126,12 @@ LocalWorker and OutsourcedWorker will wait as long as it takes for the processin
 var worker = new OutsourcedWorker(provider);
 
 // Manual creation
-var result = await new TimeoutWorker(worker, TimeSpan.FromSeconds(5)).DoWorkAsync(myWorkItem, cancellationToken);
+var result = await new TimeoutWorker(worker, TimeSpan.FromSeconds(5))
+                        .DoWorkAsync(myWorkItem, cancellationToken);
 
 // Extension method
-var result = await worker.WithTimeout(TimeSpan.FromSeconds(5)).DoWorkAsync(myWorkItem, cancellationToken);
+var result = await worker.WithTimeout(TimeSpan.FromSeconds(5))
+                        .DoWorkAsync(myWorkItem, cancellationToken);
 ```
 
 
