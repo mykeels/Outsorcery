@@ -117,8 +117,8 @@ var server = new TcpWorkServer(localEndPoint);
 server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
 ```
 
-Timeouts
---------
+Timing Out
+----------
 LocalWorker and OutsourcedWorker will wait as long as it takes for the processing of the work to finish.  You can set a timeframe in which they must complete or be automatically cancelled by using a [Timeout Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/TimeoutWorker.cs).  Timeout Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.
 
 ```
