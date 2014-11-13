@@ -118,9 +118,16 @@ namespace Outsorcery.ExampleClient
                     },
                 };
 
+                // Use fluent extension to add automatic retries and a timeout
+                // Note that putting the timeout after the retries makes it a timeout for *all* retries together.
+                // If we put it before the retries it would be a timeout *per* retry.
+                var task = worker
+                            .WithRetries(2, TimeSpan.FromMilliseconds(250))
+                            .WithTimeout(TimeSpan.FromSeconds(5))
+                            .DoWorkAsync(workItem, cancellationToken);
+
                 // Add the task to a list so that we can await them all at once.
-                // Use fluent extension to add automatic retries in the case of an exception
-                tasks.Add(worker.WithRetries(2).DoWorkAsync(workItem, cancellationToken));
+                tasks.Add(task);
             }
 
             try
