@@ -29,13 +29,10 @@ namespace Outsorcery.ExampleClient
             var provider = new SingleTcpWorkerConnectionProvider(remoteEndPoint);
 
             // We create a worker that will do the outsourcing for us. Workers are thread safe so can be shared.
-            // The second parameter specifies whether we want the worker to suppress exceptions.
-            var worker = new OutsourcedWorker(provider, true);
-
-            // Log exceptions. This event is triggered even if exceptions are suppressed by the worker.
-            worker.WorkException +=
-                (s, e) => Console.WriteLine("Exception: {0} - {1}", e.Exception.Message, e.Exception.InnerException.Message);
-
+            // The second argument is an implementation of IWorkExceptionHandler that allows us to specify how
+            // the worker responds to exceptions.
+            var worker = new OutsourcedWorker(provider, new ExampleWorkExceptionHandler());
+            
             // ============================
             // WORK
             // ============================
@@ -124,6 +121,29 @@ namespace Outsorcery.ExampleClient
                     "Work completed by worker - int: {0}. string: {1}.",
                     task.Result.IntegerValue,
                     task.Result.StringValue);
+            }
+        }
+
+        /// <summary>
+        /// An example Work Exception Handler
+        /// </summary>
+        private class ExampleWorkExceptionHandler : IWorkExceptionHandler
+        {
+            /// <summary>
+            /// Handles the work exception.
+            /// </summary>
+            /// <param name="exception">The exception.</param>
+            /// <returns>
+            /// A value indicating whether to suppress the exception.
+            /// </returns>
+            public HandleWorkExceptionResult HandleWorkException(WorkException exception)
+            {
+                Console.WriteLine(
+                            "Exception: {0} - {1}",
+                            exception.Message,
+                            exception.InnerException.Message);
+
+                return new HandleWorkExceptionResult { SuppressException = true };
             }
         }
     }

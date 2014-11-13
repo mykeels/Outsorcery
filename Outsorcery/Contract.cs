@@ -52,5 +52,18 @@ namespace Outsorcery
                 throw new ArgumentException("Numeric argument must be greater than zero");
             }
         }
+
+        /// <summary>
+        /// Determines whether [is greater than zero] [the specified value].
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <exception cref="ArgumentException">TimeSpan argument must be greater than zero</exception>
+        public static void IsGreaterThanZero(TimeSpan value)
+        {
+            if (value <= TimeSpan.Zero)
+            {
+                throw new ArgumentException("TimeSpan argument must be greater than zero");
+            }
+        }
     }
 }

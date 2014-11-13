@@ -24,12 +24,15 @@ namespace Outsorcery
         private readonly IWorkloadBenchmark _workloadBenchmark;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TcpWorkServer"/> class
-        /// using <see cref="BasicCpuWorkloadBenchmark"/> for its benchmark.
+        /// Initializes a new instance of the <see cref="TcpWorkServer" /> class
+        /// using <see cref="BasicCpuWorkloadBenchmark" /> for its benchmark.
         /// </summary>
         /// <param name="localEndPoint">The local endpoint.</param>
-        public TcpWorkServer(IPEndPoint localEndPoint)
-            : this(localEndPoint, new BasicCpuWorkloadBenchmark())
+        /// <param name="remoteWorkExceptionHandler">The remote work exception handler.</param>
+        public TcpWorkServer(
+                IPEndPoint localEndPoint,
+                IWorkExceptionHandler remoteWorkExceptionHandler)
+            : this(localEndPoint, new BasicCpuWorkloadBenchmark(), remoteWorkExceptionHandler)
         {
         }
 
@@ -38,19 +41,27 @@ namespace Outsorcery
         /// </summary>
         /// <param name="localEndPoint">The local endpoint.</param>
         /// <param name="workloadBenchmark">The benchmark which provides a score of our current workload.</param>
-        public TcpWorkServer(IPEndPoint localEndPoint, IWorkloadBenchmark workloadBenchmark)
+        /// <param name="remoteWorkExceptionHandler">The remote work exception handler.</param>
+        public TcpWorkServer(
+            IPEndPoint localEndPoint, 
+            IWorkloadBenchmark workloadBenchmark,
+            IWorkExceptionHandler remoteWorkExceptionHandler)
         {
             Contract.IsNotNull(localEndPoint);
             Contract.IsNotNull(workloadBenchmark);
 
+            RemoteWorkExceptionHandler = remoteWorkExceptionHandler;
             _localEndPoint = localEndPoint;
             _workloadBenchmark = workloadBenchmark;
         }
 
         /// <summary>
-        /// Occurs when an exception causes a remote work operation to fail.
+        /// Gets the exception handler.
         /// </summary>
-        public event EventHandler<WorkExceptionEventArgs> RemoteWorkException;
+        /// <value>
+        /// The exception handler.
+        /// </value>
+        public IWorkExceptionHandler RemoteWorkExceptionHandler { get; private set; }
 
         /// <summary>
         /// Runs the work server until cancellation is requested.
@@ -116,17 +127,22 @@ namespace Outsorcery
             }
             catch (Exception ex)
             {
-                // Report then swallow any exceptions to prevent client issues bringing the server down
-                if (RemoteWorkException != null)
-                {
-                    var message = string.Format(
+                var message = string.Format(
                         "An exception occurred when processing TCP client {0}:{1}.",
                         endpoint != null ? endpoint.Address.ToString() : "????",
                         endpoint != null ? endpoint.Port.ToString(CultureInfo.InvariantCulture) : "????");
 
-                    var eventArgs = new WorkExceptionEventArgs(new WorkException(message, workItem, ex));
+                var workException = new WorkException(message, workItem, ex);
 
-                    RemoteWorkException(this, eventArgs);
+                if (RemoteWorkExceptionHandler == null)
+                {
+                    throw workException;
+                }
+
+                var result = RemoteWorkExceptionHandler.HandleWorkException(workException);
+                if (!result.SuppressException)
+                {
+                    throw workException;
                 }
             }
         }

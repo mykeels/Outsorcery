@@ -29,12 +29,33 @@ namespace Outsorcery.ExampleServer
         public static Task UsageExample(CancellationToken cancellationToken)
         {
             var localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4444);
-            var server = new TcpWorkServer(localEndPoint);
 
-            server.RemoteWorkException += 
-                (s, e) => Console.WriteLine("Exception: {0} - {1}", e.Exception.Message, e.Exception.InnerException.Message);
-                                    
+            var server = new TcpWorkServer(localEndPoint, new ExampleWorkExceptionHandler());
+
             return server.Run(cancellationToken);
+        }
+        
+        /// <summary>
+        /// An example Work Exception Handler
+        /// </summary>
+        private class ExampleWorkExceptionHandler : IWorkExceptionHandler
+        {
+            /// <summary>
+            /// Handles the work exception.
+            /// </summary>
+            /// <param name="exception">The exception.</param>
+            /// <returns>
+            /// A value indicating whether to suppress the exception.
+            /// </returns>
+            public HandleWorkExceptionResult HandleWorkException(WorkException exception)
+            {
+                Console.WriteLine(
+                            "Exception: {0} - {1}",
+                            exception.Message,
+                            exception.InnerException.Message);
+
+                return new HandleWorkExceptionResult { SuppressException = true };
+            }
         }
     }
 }

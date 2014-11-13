@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿/*
+    License: http://www.apache.org/licenses/LICENSE-2.0
+ */
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 

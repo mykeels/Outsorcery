@@ -17,21 +17,21 @@ namespace Outsorcery
         /// <summary>The internal worker</summary>
         private readonly IWorker _internalWorker;
 
-        /// <summary>The number of attempts</summary>
-        private readonly int _numberOfAttempts;
+        /// <summary>The number of retries</summary>
+        private readonly int _numberOfRetries;
 
-        /// <summary>The delay between attempts</summary>
-        private readonly TimeSpan _delayBetweenAttempts;
+        /// <summary>The delay between retries</summary>
+        private readonly TimeSpan _delayBetweenRetries;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="RetryWorker" /> class.
         /// </summary>
         /// <param name="internalWorker">The internal worker.</param>
-        /// <param name="numberOfAttempts">The number of attempts to make.</param>
+        /// <param name="numberOfRetries">The number of retries to make including the first one.</param>
         public RetryWorker(
                     IWorker internalWorker,
-                    int numberOfAttempts)
-            : this(internalWorker, numberOfAttempts, false)
+                    int numberOfRetries)
+            : this(internalWorker, numberOfRetries, TimeSpan.Zero)
         {
         }
 
@@ -39,50 +39,19 @@ namespace Outsorcery
         /// Initializes a new instance of the <see cref="RetryWorker" /> class.
         /// </summary>
         /// <param name="internalWorker">The internal worker.</param>
-        /// <param name="numberOfAttempts">The number of attempts to make.</param>
-        /// <param name="delayBetweenAttempts">The delay between attempts.</param>
+        /// <param name="numberOfRetries">The number of retries to make including the first one.</param>
+        /// <param name="delayBetweenRetries">The delay between retries.</param>
         public RetryWorker(
                     IWorker internalWorker,
-                    int numberOfAttempts,
-                    TimeSpan delayBetweenAttempts)
-            : this(internalWorker, numberOfAttempts, delayBetweenAttempts, false)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RetryWorker" /> class.
-        /// </summary>
-        /// <param name="internalWorker">The internal worker.</param>
-        /// <param name="numberOfAttempts">The number of attempts to make.</param>
-        /// <param name="suppressExceptions">if set to <c>true</c> [suppress exceptions].</param>
-        public RetryWorker(
-                    IWorker internalWorker,
-                    int numberOfAttempts,
-                    bool suppressExceptions)
-            : this(internalWorker, numberOfAttempts, TimeSpan.Zero, suppressExceptions)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RetryWorker" /> class.
-        /// </summary>
-        /// <param name="internalWorker">The internal worker.</param>
-        /// <param name="numberOfAttempts">The number of attempts to make.</param>
-        /// <param name="delayBetweenAttempts">The delay between attempts.</param>
-        /// <param name="suppressExceptions">if set to <c>true</c> [suppress exceptions].</param>
-        public RetryWorker(
-                    IWorker internalWorker,
-                    int numberOfAttempts,
-                    TimeSpan delayBetweenAttempts,
-                    bool suppressExceptions)
-            : base(suppressExceptions)
+                    int numberOfRetries,
+                    TimeSpan delayBetweenRetries)
         {
             Contract.IsNotNull(internalWorker);
-            Contract.IsGreaterThanZero(numberOfAttempts);
+            Contract.IsGreaterThanZero(numberOfRetries);
 
             _internalWorker = internalWorker;
-            _numberOfAttempts = numberOfAttempts;
-            _delayBetweenAttempts = delayBetweenAttempts;
+            _numberOfRetries = numberOfRetries;
+            _delayBetweenRetries = delayBetweenRetries;
         }
 
         /// <summary>
@@ -99,9 +68,10 @@ namespace Outsorcery
                                                     CancellationToken cancellationToken)
         {
             var attemptNumber = 0;
+            var maximumAttempts = _numberOfRetries + 1;
             var exceptions = new List<Exception>();
 
-            while (++attemptNumber <= _numberOfAttempts)
+            while (++attemptNumber <= maximumAttempts)
             {
                 try
                 {
@@ -112,14 +82,14 @@ namespace Outsorcery
                     exceptions.Add((ex is WorkException) ? ex.InnerException : ex);
                 }
 
-                if (_delayBetweenAttempts > TimeSpan.Zero
-                    && attemptNumber <= _numberOfAttempts)
+                if (_delayBetweenRetries > TimeSpan.Zero
+                    && attemptNumber <= maximumAttempts)
                 {
-                    await Task.Delay(_delayBetweenAttempts, cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(_delayBetweenRetries, cancellationToken).ConfigureAwait(false);
                 }
             }
 
-            var message = string.Format("RetryWorker failed all {0} attempts.", _numberOfAttempts);
+            var message = string.Format("RetryWorker failed all {0} attempts.", maximumAttempts);
             throw new AggregateException(message, exceptions);
         }
     }

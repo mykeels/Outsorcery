@@ -15,9 +15,9 @@ namespace Outsorcery
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalWorker"/> class.
         /// </summary>
-        /// <param name="suppressExceptions">if set to <c>true</c> [suppress exceptions].</param>
-        public LocalWorker(bool suppressExceptions)
-            : base(suppressExceptions)
+        /// <param name="exceptionHandler">The exception handler.</param>
+        public LocalWorker(IWorkExceptionHandler exceptionHandler)
+            : base(exceptionHandler)
         {
         }
 
@@ -25,8 +25,7 @@ namespace Outsorcery
         /// Initializes a new instance of the <see cref="LocalWorker"/> class.
         /// </summary>
         public LocalWorker()
-            : base(false)
-        {
+        {   
         }
 
         /// <summary>

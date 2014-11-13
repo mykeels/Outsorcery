@@ -40,6 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FluentWorkerExtensions.cs" />
+    <Compile Include="HandleWorkExceptionResult.cs" />
+    <Compile Include="IWorkExceptionHandler.cs" />
+    <Compile Include="TimeoutWorker.cs" />
     <Compile Include="RetryWorker.cs" />
     <Compile Include="WorkerBase.cs" />
     <Compile Include="WorkException.cs" />
@@ -51,7 +55,6 @@
     <Compile Include="IWorker.cs" />
     <Compile Include="IWorkerConnection.cs" />
     <Compile Include="IWorkerConnectionProvider.cs" />
-    <Compile Include="WorkExceptionEventArgs.cs" />
     <Compile Include="SingleTcpWorkerConnectionProvider.cs" />
     <Compile Include="RoundRobinTcpWorkerConnectionProvider.cs" />
     <Compile Include="LoadBalancedTcpWorkerConnectionProvider.cs" />
