@@ -119,7 +119,7 @@ server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
 
 Timing Out
 ----------
-All Workers will wait as long as it takes for the processing of the work to finish before returning.  You can set a timeframe in which they must complete the work or be automatically cancelled by using a [Timeout Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/TimeoutWorker.cs).  Timeout Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.
+All workers will wait as long as it takes for the processing of the work to finish before returning.  You can set a timeframe in which they must complete the work or be automatically cancelled by using a [Timeout Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/TimeoutWorker.cs).  Timeout Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.
 
 ```
 // CLIENT APPLICATION
