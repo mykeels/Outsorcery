@@ -86,7 +86,21 @@ new TcpWorkServer(localEndPoint, customBenchmark).Run(cancellationToken).Wait();
 
 Exception Handling
 ------------------
-Documentation coming soon!
+To receive notification when a Worker encounters an exception, subscribe to the WorkException event.  This event occurs even if an exception is suppressed by a Retry, so can be useful for keeping track of your application's silent failures.
+
+```
+// CLIENT APPLICATION
+var worker = new RemoteWorker(provider);
+worker.WorkException += MyWorkerOnWorkExceptionHandler;
+```
+
+Work Servers suppress all exceptions they encounter while processing a client connection and its associated work. To receive notification when client related exceptions occur, subscribe to the RemoteWorkException event.
+
+```
+// SERVER APPLICATION
+var server = new TcpWorkServer(localEndPoint);
+server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
+```
 
 Retries and Timeouts
 --------------------
