@@ -8,7 +8,7 @@ Outsorcery is an open-source library for adding [distributed computing](http://e
 
 Getting Started
 ---------------
-The first thing to do when getting started with Outsorcery is define a unit of distributable work. The only requirements are that it implements IWorkItem< TResult > and that it is Serializable.  You should put all your work items into a class library so that the server and client projects can reference them.
+The first thing to do when getting started with Outsorcery is define a unit of distributable work.  All it takes is to implement IWorkItem< TResult > and to make your class serializable so Outsorcery can send it to the work server.  Your result Type needs to be serializable too, for the same reason.
 
 ```csharp
 // WORK ITEM CLASS LIBRARY
@@ -26,6 +26,8 @@ public class MyFirstWorkItem : IWorkItem<int>
     }
 }            
 ```
+
+You should put all your work items into a class library so that the Server and Client applications both have access.
 
 Do Work Locally
 ---------------
