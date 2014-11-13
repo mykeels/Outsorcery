@@ -85,6 +85,9 @@ new TcpWorkServer(localEndPoint, customBenchmark).Run(cancellationToken).Wait();
 ```
 
 Exception Handling
---------------
+------------------
 Documentation coming soon!
 
+Retries and Timeouts
+--------------------
+Documentation coming soon!
