@@ -8,7 +8,7 @@ Outsorcery is an open-source library for adding [distributed computing](http://e
 
 Getting Started
 ---------------
-The first thing to do when getting started with Outsorcery is define a unit of distributable work.  All it takes is to implement IWorkItem< TResult > and to make your class serializable so Outsorcery can send it to the work server.  Your result Type needs to be serializable too, for the same reason.
+The first thing to do when getting started with Outsorcery is define a unit of distributable work.  All it takes is to implement IWorkItem< TResult > and to make your class serializable so Outsorcery can send it to the work server.  Your result Type needs to be serializable too, so the server can return it.  Don't worry though, when Outsorcery gives the result back to you it'll be the Type you expected!
 
 ```csharp
 // WORK ITEM CLASS LIBRARY
@@ -85,20 +85,9 @@ new TcpWorkServer(localEndPoint, customBenchmark).Run(cancellationToken).Wait();
 ```
 
 Exception Handling
---------------
-Workers throw exceptions by default but you can suppress this behaviour by using the appropriate overloaded constructor.  When exceptions are suppressed and an exception occurs, a Worker returns the default value for TResult instead of throwing the exception.  To receive notification when these exceptions occur, subscribe to the WorkException event.
+------------------
+Documentation coming soon!
 
-```csharp
-// CLIENT
-var worker = new RemoteWorker(provider);
-worker.WorkException += MyWorkerOnWorkExceptionHandler;
-```
-
-Work Servers suppress all exceptions encountered while processing work received from a client to prevent application failure. To receive notification when these exceptions occur subscribe to the RemoteWorkException event.
-
-```csharp
-// SERVER
-var server = new TcpWorkServer(localEndPoint);
-server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
-```
-
+Retries and Timeouts
+--------------------
+Documentation coming soon!
