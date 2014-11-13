@@ -41,8 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FluentWorkerExtensions.cs" />
-    <Compile Include="HandleWorkExceptionResult.cs" />
-    <Compile Include="IWorkExceptionHandler.cs" />
     <Compile Include="TimeoutWorker.cs" />
     <Compile Include="RetryWorker.cs" />
     <Compile Include="WorkerBase.cs" />
@@ -66,6 +64,7 @@
     <Compile Include="StreamWorkerConnection.cs" />
     <Compile Include="TcpWorkerConnectionProviderBase.cs" />
     <Compile Include="TcpWorkServer.cs" />
+    <Compile Include="WorkExceptionEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

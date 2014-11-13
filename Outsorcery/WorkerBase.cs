@@ -14,30 +14,11 @@ namespace Outsorcery
     {
         /// <summary>The work error message</summary>
         private const string WorkErrorMessage = "An exception occurred while doing work";
-
+        
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkerBase"/> class.
+        /// Occurs when [work exception].
         /// </summary>
-        /// <param name="exceptionHandler">The exception handler.</param>
-        protected WorkerBase(IWorkExceptionHandler exceptionHandler)
-        {
-            WorkExceptionHandler = exceptionHandler;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WorkerBase"/> class.
-        /// </summary>
-        protected WorkerBase()
-        {
-        }
-
-        /// <summary>
-        /// Gets the exception handler.
-        /// </summary>
-        /// <value>
-        /// The exception handler.
-        /// </value>
-        public IWorkExceptionHandler WorkExceptionHandler { get; private set; }
+        public event EventHandler<WorkExceptionEventArgs> WorkException;
 
         /// <summary>
         /// Does the work asynchronously.
@@ -59,20 +40,9 @@ namespace Outsorcery
             catch (Exception ex)
             {
                 var workException = ex as WorkException ?? new WorkException(WorkErrorMessage, workItem, ex);
-
-                if (WorkExceptionHandler == null)
-                {
-                    throw workException;
-                }
-
-                var result = WorkExceptionHandler.HandleWorkException(workException);
-                if (!result.SuppressException)
-                {
-                    throw workException;
-                }
+                OnWorkException(workException);
+                throw workException;
             }
-
-            return default(TResult);
         }
 
         /// <summary>
@@ -87,5 +57,17 @@ namespace Outsorcery
         protected abstract Task<TResult> DoWorkInternalAsync<TResult>(
                                         IWorkItem<TResult> workItem,
                                         CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Called when [work exception].
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        protected virtual void OnWorkException(WorkException exception)
+        {
+            if (WorkException != null)
+            {
+                WorkException(this, new WorkExceptionEventArgs(exception));
+            }
+        }
     }
 }

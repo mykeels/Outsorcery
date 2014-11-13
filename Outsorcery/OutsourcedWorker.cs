@@ -20,19 +20,6 @@ namespace Outsorcery
         /// Initializes a new instance of the <see cref="OutsourcedWorker" /> class.
         /// </summary>
         /// <param name="connectionProvider">The connection provider.</param>
-        /// <param name="exceptionHandler">The exception handler.</param>
-        public OutsourcedWorker(
-                    IWorkerConnectionProvider connectionProvider,
-                    IWorkExceptionHandler exceptionHandler)
-            : base(exceptionHandler)
-        {
-            _connectionProveProvider = connectionProvider;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OutsourcedWorker" /> class.
-        /// </summary>
-        /// <param name="connectionProvider">The connection provider.</param>
         public OutsourcedWorker(IWorkerConnectionProvider connectionProvider)
         {
             _connectionProveProvider = connectionProvider;

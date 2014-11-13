@@ -29,9 +29,11 @@ namespace Outsorcery.ExampleClient
             var provider = new SingleTcpWorkerConnectionProvider(remoteEndPoint);
 
             // We create a worker that will do the outsourcing for us. Workers are thread safe so can be shared.
-            // The second argument is an implementation of IWorkExceptionHandler that allows us to specify how
-            // the worker responds to exceptions.
-            var worker = new OutsourcedWorker(provider, new ExampleWorkExceptionHandler());
+            var worker = new OutsourcedWorker(provider);
+
+            // Add a logger for all exceptions that occur (including ones otherwise consumed by Retry)
+            worker.WorkException += (s, e) => 
+                Console.WriteLine("Exception: {0} - {1}", e.Exception.Message, e.Exception.InnerException.Message);
             
             // ============================
             // WORK
@@ -68,16 +70,24 @@ namespace Outsorcery.ExampleClient
                 },
             };
 
-            // await the result
-            var result = await worker.DoWorkAsync(workItem, cancellationToken);
-
-            // Now we use the result in the usual way.
-            if (result != null)
+            try
             {
-                Console.WriteLine(
-                    "Work completed by worker - int: {0}. string: {1}.",
-                    result.IntegerValue,
-                    result.StringValue);
+                // await the result
+                // Use fluent extension to add automatic retries in the case of an exception
+                var result = await worker.WithRetries(2).DoWorkAsync(workItem, cancellationToken);
+
+                // Now we use the result in the usual way.
+                if (result != null)
+                {
+                    Console.WriteLine(
+                        "Work completed by worker - int: {0}. string: {1}.",
+                        result.IntegerValue,
+                        result.StringValue);
+                }
+            }
+            catch
+            {
+                // Handle any exceptions here
             }
         }
 
@@ -109,41 +119,26 @@ namespace Outsorcery.ExampleClient
                 };
 
                 // Add the task to a list so that we can await them all at once.
-                tasks.Add(worker.DoWorkAsync(workItem, cancellationToken));
+                // Use fluent extension to add automatic retries in the case of an exception
+                tasks.Add(worker.WithRetries(2).DoWorkAsync(workItem, cancellationToken));
             }
 
-            // Wait for all our results to come back then output the results to console.
-            await Task.WhenAll(tasks);
+            try
+            {
+                // Wait for all our results to come back then output the results to console.
+                await Task.WhenAll(tasks);
+            }
+            catch 
+            {
+                // Handle any exception here
+            }
 
-            foreach (var task in tasks.Where(task => task.Result != null))
+            foreach (var task in tasks.Where(task => task.Exception == null))
             {
                 Console.WriteLine(
                     "Work completed by worker - int: {0}. string: {1}.",
                     task.Result.IntegerValue,
                     task.Result.StringValue);
-            }
-        }
-
-        /// <summary>
-        /// An example Work Exception Handler
-        /// </summary>
-        private class ExampleWorkExceptionHandler : IWorkExceptionHandler
-        {
-            /// <summary>
-            /// Handles the work exception.
-            /// </summary>
-            /// <param name="exception">The exception.</param>
-            /// <returns>
-            /// A value indicating whether to suppress the exception.
-            /// </returns>
-            public HandleWorkExceptionResult HandleWorkException(WorkException exception)
-            {
-                Console.WriteLine(
-                            "Exception: {0} - {1}",
-                            exception.Message,
-                            exception.InnerException.Message);
-
-                return new HandleWorkExceptionResult { SuppressException = true };
             }
         }
     }

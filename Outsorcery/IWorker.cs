@@ -3,6 +3,7 @@
  */
 namespace Outsorcery
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -12,12 +13,9 @@ namespace Outsorcery
     public interface IWorker
     {
         /// <summary>
-        /// Gets the exception handler.
+        /// Occurs when [work exception].
         /// </summary>
-        /// <value>
-        /// The exception handler.
-        /// </value>
-        IWorkExceptionHandler WorkExceptionHandler { get; }
+        event EventHandler<WorkExceptionEventArgs> WorkException;
 
         /// <summary>
         /// Does the work asynchronously.

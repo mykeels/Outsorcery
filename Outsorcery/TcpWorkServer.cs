@@ -28,11 +28,9 @@ namespace Outsorcery
         /// using <see cref="BasicCpuWorkloadBenchmark" /> for its benchmark.
         /// </summary>
         /// <param name="localEndPoint">The local endpoint.</param>
-        /// <param name="remoteWorkExceptionHandler">The remote work exception handler.</param>
         public TcpWorkServer(
-                IPEndPoint localEndPoint,
-                IWorkExceptionHandler remoteWorkExceptionHandler)
-            : this(localEndPoint, new BasicCpuWorkloadBenchmark(), remoteWorkExceptionHandler)
+                IPEndPoint localEndPoint)
+            : this(localEndPoint, new BasicCpuWorkloadBenchmark())
         {
         }
 
@@ -41,27 +39,21 @@ namespace Outsorcery
         /// </summary>
         /// <param name="localEndPoint">The local endpoint.</param>
         /// <param name="workloadBenchmark">The benchmark which provides a score of our current workload.</param>
-        /// <param name="remoteWorkExceptionHandler">The remote work exception handler.</param>
         public TcpWorkServer(
             IPEndPoint localEndPoint, 
-            IWorkloadBenchmark workloadBenchmark,
-            IWorkExceptionHandler remoteWorkExceptionHandler)
+            IWorkloadBenchmark workloadBenchmark)
         {
             Contract.IsNotNull(localEndPoint);
             Contract.IsNotNull(workloadBenchmark);
 
-            RemoteWorkExceptionHandler = remoteWorkExceptionHandler;
             _localEndPoint = localEndPoint;
             _workloadBenchmark = workloadBenchmark;
         }
 
         /// <summary>
-        /// Gets the exception handler.
+        /// Occurs when [work exception].
         /// </summary>
-        /// <value>
-        /// The exception handler.
-        /// </value>
-        public IWorkExceptionHandler RemoteWorkExceptionHandler { get; private set; }
+        public event EventHandler<WorkExceptionEventArgs> RemoteWorkException;
 
         /// <summary>
         /// Runs the work server until cancellation is requested.
@@ -127,22 +119,14 @@ namespace Outsorcery
             }
             catch (Exception ex)
             {
-                var message = string.Format(
-                        "An exception occurred when processing TCP client {0}:{1}.",
-                        endpoint != null ? endpoint.Address.ToString() : "????",
-                        endpoint != null ? endpoint.Port.ToString(CultureInfo.InvariantCulture) : "????");
-
-                var workException = new WorkException(message, workItem, ex);
-
-                if (RemoteWorkExceptionHandler == null)
+                if (RemoteWorkException != null)
                 {
-                    throw workException;
-                }
+                    var message = string.Format(
+                           "An exception occurred when processing TCP client {0}:{1}.",
+                           endpoint != null ? endpoint.Address.ToString() : "????",
+                           endpoint != null ? endpoint.Port.ToString(CultureInfo.InvariantCulture) : "????");
 
-                var result = RemoteWorkExceptionHandler.HandleWorkException(workException);
-                if (!result.SuppressException)
-                {
-                    throw workException;
+                    RemoteWorkException(this, new WorkExceptionEventArgs(new WorkException(message, workItem, ex)));
                 }
             }
         }

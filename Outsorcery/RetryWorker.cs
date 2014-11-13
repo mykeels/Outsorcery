@@ -89,6 +89,7 @@ namespace Outsorcery
                 }
             }
 
+            // No attempt succeeded, rethrow all the exceptions together
             var message = string.Format("RetryWorker failed all {0} attempts.", maximumAttempts);
             throw new AggregateException(message, exceptions);
         }

@@ -3,6 +3,7 @@
  */
 namespace Outsorcery
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -12,12 +13,9 @@ namespace Outsorcery
     public interface IWorkServer
     {
         /// <summary>
-        /// Gets the exception handler.
+        /// Occurs when [work exception].
         /// </summary>
-        /// <value>
-        /// The exception handler.
-        /// </value>
-        IWorkExceptionHandler RemoteWorkExceptionHandler { get; }
+        event EventHandler<WorkExceptionEventArgs> RemoteWorkException;
 
         /// <summary>
         /// Runs the work server until cancellation is requested.

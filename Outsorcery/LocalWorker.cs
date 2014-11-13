@@ -13,22 +13,6 @@ namespace Outsorcery
     public class LocalWorker : WorkerBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="LocalWorker"/> class.
-        /// </summary>
-        /// <param name="exceptionHandler">The exception handler.</param>
-        public LocalWorker(IWorkExceptionHandler exceptionHandler)
-            : base(exceptionHandler)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LocalWorker"/> class.
-        /// </summary>
-        public LocalWorker()
-        {   
-        }
-
-        /// <summary>
         /// Does the work asynchronously - protected implementation.
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
