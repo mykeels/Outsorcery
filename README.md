@@ -72,7 +72,7 @@ var endPoints = new List<IPEndPoint> { remoteEndPoint1, remoteEndPoint2, ... };
 var provider = new RoundRobinTcpWorkerConnectionProvider(endPoints);
 ```
 
-[Load Balanced](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/LoadBalancedTcpWorkerConnectionProvider.cs) distributes a work item to the server that reports having the lowest workload. You can customise the server's response by providing a custom implementation of IWorkloadBenchmark to the server constructor.
+[Load Balanced](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/LoadBalancedTcpWorkerConnectionProvider.cs) distributes a work item to the server that reports having the lowest workload. You can customise how the server estimates its workload by providing a custom implementation of IWorkloadBenchmark to the server constructor.
 
 ```csharp
 // CLIENT APPLICATION
