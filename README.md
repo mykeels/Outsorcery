@@ -8,7 +8,7 @@ Outsorcery is an open-source library for adding [distributed computing](http://e
 
 Getting Started
 ---------------
-The first thing to do when getting started with Outsorcery is define a unit of distributable work.  All it takes is to implement IWorkItem< TResult > and to make your class serializable so Outsorcery can send it to the work server.  Your result Type needs to be serializable too, so the server can return it.  Don't worry though, when Outsorcery gives the result back to you it'll be the Type you expected!
+The first thing to do when getting started with Outsorcery is define a unit of distributable work.  All it takes is to implement [IWorkItem](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/IWorkItem.cs) and to make your class serializable so Outsorcery can send it to the work server.  Your result Type needs to be serializable too, so the server can return it.  Don't worry though, when Outsorcery gives the result back to you it'll be the Type you expected!
 
 ```csharp
 // WORK ITEM CLASS LIBRARY
@@ -31,7 +31,7 @@ You should put all your work items into a class library so that the Server and C
 
 Do Work Locally
 ---------------
-Local Workers can be useful for testing or as a failsafe when the work servers are unavailable.
+[Local Workers](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/LocalWorker.cs) can be useful for testing or as a failsafe when the work servers are unavailable.
 
 ```csharp
 // CLIENT APPLICATION
@@ -42,7 +42,7 @@ var result = await worker.DoWorkAsync(workItem, new CancellationToken());
 
 Do Work Remotely
 ----------------
-Remote Workers distribute the work to one or more servers for completion. Distributed computing using Outsorcery's Remote Workers has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a fully functioning example.
+[Outsourced Workers](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/OutsourcedWorker.cs) distribute the work to one or more servers for completion. Distributed computing using Outsorcery's Outsourced Workers has been designed to be as easy as possible. The projects [ExampleServer](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleServer) and [ExampleClient](https://github.com/SteveLillis/Outsorcery/tree/master/Outsorcery.ExampleClient) are a fully functioning example.
 
 ```csharp
 // CLIENT APPLICATION
@@ -84,14 +84,27 @@ var customBenchmark = new MyCustomWorkloadBenchmark();
 new TcpWorkServer(localEndPoint, customBenchmark).Run(cancellationToken).Wait();
 ```
 
-Exception Handling
-------------------
+Exception Handling and Retries
+------------------------------
 To receive notification when a Worker encounters an exception, subscribe to the WorkException event.  This event occurs even if an exception is suppressed by a Retry, so can be useful for keeping track of your application's silent failures.
 
 ```
 // CLIENT APPLICATION
-var worker = new RemoteWorker(provider);
+var worker = new OutsourcedWorker(provider);
 worker.WorkException += MyWorkerOnWorkExceptionHandler;
+```
+
+You can suppress the first X exceptions that a Worker encounters and automatically attempt the work again using a [Retry Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/RetryWorker.cs). Retry Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.
+
+```
+// CLIENT APPLICATION
+var worker = new OutsourcedWorker(provider);
+
+// Manual creation
+var result = await new RetryWorker(worker, 2).DoWorkAsync(myWorkItem, cancellationToken);
+
+// Extension method
+var result = await worker.WithRetries(2).DoWorkAsync(myWorkItem, cancellationToken);
 ```
 
 Work Servers suppress all exceptions they encounter while processing a client connection and its associated work. To receive notification when client related exceptions occur, subscribe to the RemoteWorkException event.
@@ -102,6 +115,19 @@ var server = new TcpWorkServer(localEndPoint);
 server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
 ```
 
-Retries and Timeouts
---------------------
-Documentation coming soon!
+Timeouts
+--------
+LocalWorker and OutsourcedWorker will wait as long as it takes for the processing of the work to finish.  You can set a timeframe in which they must complete or be automatically cancelled by using a [Timeout Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/TimeoutWorker.cs).  Timeout Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.
+
+```
+// CLIENT APPLICATION
+var worker = new OutsourcedWorker(provider);
+
+// Manual creation
+var result = await new TimeoutWorker(worker, TimeSpan.FromSeconds(5)).DoWorkAsync(myWorkItem, cancellationToken);
+
+// Extension method
+var result = await worker.WithTimeout(TimeSpan.FromSeconds(5)).DoWorkAsync(myWorkItem, cancellationToken);
+```
+
+
