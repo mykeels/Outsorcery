@@ -8,7 +8,7 @@ Outsorcery is an open-source library for adding [distributed computing](http://e
 
 Getting Started
 ---------------
-The first thing to do when getting started with Outsorcery is define a unit of distributable work.  All it takes is to implement [IWorkItem](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/IWorkItem.cs) and to make your class serializable so it can be sent to the work server.  Your result Type needs to be serializable too, so the server can return it.  Don't worry though, when you get the result back it'll be the Type you expect!
+The first thing to do when getting started with Outsorcery is define a unit of distributable work.  All it takes is to implement [IWorkItem](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/IWorkItem.cs) and to make your class serializable so it can be sent to the work server.  Your result Type needs to be serializable too so the server can return it.  Don't worry though, when you get the result back it'll be the Type you expect!
 
 ```csharp
 // WORK ITEM CLASS LIBRARY
@@ -86,7 +86,7 @@ new TcpWorkServer(localEndPoint, customBenchmark).Run(cancellationToken).Wait();
 
 Exception Handling and Retries
 ------------------------------
-To receive notification when a Worker encounters an exception, subscribe to the WorkException event.  This event occurs even if an exception is suppressed by a Retry, so can be useful for keeping track of your application's silent failures.
+To receive notification when a Worker encounters an exception, subscribe to the WorkException event.  This event occurs even if an exception is suppressed by a Retry so can be useful for keeping track of your application's silent failures.
 
 ```
 // CLIENT APPLICATION
