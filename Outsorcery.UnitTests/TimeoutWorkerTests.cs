@@ -25,7 +25,7 @@ namespace Outsorcery.UnitTests
         /// <returns>An awaitable task.</returns>
         [Test]
         [ExpectedException(typeof(WorkException))]
-        public async Task TimeoutThrowsWorkException()
+        public async Task ThrowsWorkExceptionWhenTimeout()
         {
             // ARRANGE
             var worker = new TimeoutWorker(new LocalWorker(), TimeSpan.FromMilliseconds(10));
@@ -39,7 +39,7 @@ namespace Outsorcery.UnitTests
         /// </summary>
         /// <returns>An awaitable task.</returns>
         [Test]
-        public async Task TimeoutWorkExceptionInnerExceptionIsTimeoutException()
+        public async Task WorkExceptionInnerExceptionIsTimeoutException()
         {
             // ARRANGE
             var worker = new TimeoutWorker(new LocalWorker(), TimeSpan.FromMilliseconds(10));
@@ -61,7 +61,7 @@ namespace Outsorcery.UnitTests
         /// </summary>
         /// <returns>An awaitable task.</returns>
         [Test]
-        public async Task NoTimeoutReturnsCorrectResult()
+        public async Task ReturnsCorrectResultWhenNoException()
         {
             // ARRANGE
             var worker = new TimeoutWorker(new LocalWorker(), TimeSpan.FromMilliseconds(1000));
