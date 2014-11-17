@@ -125,7 +125,7 @@ namespace Outsorcery
                     // Send the client the result of the work item, if an exception occurred, send that instead
                     await connection.SendObjectAsync(exception ?? result, cancellationToken).ConfigureAwait(false);
 
-                    // If an exception occurred, throw it again to trigger the handling 
+                    // If an exception occurred while processing work, throw it again to trigger the handling 
                     if (exception != null)
                     {
                         throw exception;
