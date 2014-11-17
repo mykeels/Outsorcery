@@ -36,7 +36,7 @@ namespace Outsorcery.UnitTests
            
             // ASSERT
             Assert.That(result, Is.EqualTo(SuccessValue));
-            Assert.That(workItem.AttemptCount.Value, Is.EqualTo(1));
+            Assert.That(workItem.AttemptCount, Is.EqualTo(1));
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Outsorcery.UnitTests
             catch (Exception)
             {
                 // ASSERT
-                Assert.That(workItem.AttemptCount.Value, Is.EqualTo(MaxRetries + 1));
+                Assert.That(workItem.AttemptCount, Is.EqualTo(MaxRetries + 1));
                 throw;
             }
         }
@@ -126,7 +126,6 @@ namespace Outsorcery.UnitTests
             /// <param name="throwExceptions"></param>
             public TestWorkItem(bool throwExceptions)
             {
-                AttemptCount = new AttemptCount();
                 _throwExceptions = throwExceptions;
             }
 
@@ -147,7 +146,7 @@ namespace Outsorcery.UnitTests
             /// <value>
             /// The attempt count.
             /// </value>
-            public AttemptCount AttemptCount { get; private set; }
+            public int AttemptCount { get; private set; }
             
             /// <summary>
             /// Does the work asynchronously.
@@ -158,7 +157,7 @@ namespace Outsorcery.UnitTests
             /// </returns>
             public Task<int> DoWorkAsync(CancellationToken cancellationToken)
             {
-                AttemptCount.Increment();
+                ++AttemptCount;
 
                 if (_throwExceptions)
                 {
@@ -166,28 +165,6 @@ namespace Outsorcery.UnitTests
                 }
 
                 return Task.FromResult(SuccessValue);
-            }
-        }
-
-        /// <summary>
-        /// Attempt Count class
-        /// </summary>
-        private class AttemptCount
-        {
-            /// <summary>
-            /// Gets the value.
-            /// </summary>
-            /// <value>
-            /// The value.
-            /// </value>
-            public int Value { get; private set; }
-
-            /// <summary>
-            /// Increments this instance.
-            /// </summary>
-            public void Increment()
-            {
-                Value++;
             }
         }
     }
