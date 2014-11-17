@@ -111,7 +111,7 @@ namespace Outsorcery
                     workItem = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
 
                     // do the work, capturing any exceptions that may occur
-                    dynamic result = null;
+                    object result = null;
                     Exception exception = null;
                     try
                     {
