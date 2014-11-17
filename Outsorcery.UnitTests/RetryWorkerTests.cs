@@ -107,7 +107,7 @@ namespace Outsorcery.UnitTests
             {
                 // ASSERT
                 Assert.That(
-                    ((AggregateException) ex.InnerException).InnerExceptions.Count, 
+                    ((AggregateException)ex.InnerException).InnerExceptions.Count, 
                     Is.EqualTo(MaxRetries + 1));
             }
         }
@@ -123,7 +123,7 @@ namespace Outsorcery.UnitTests
             /// <summary>
             /// Initializes a new instance of the <see cref="TestWorkItem"/> class.
             /// </summary>
-            /// <param name="throwExceptions"></param>
+            /// <param name="throwExceptions">A value indicating whether to [throw exceptions]</param>
             public TestWorkItem(bool throwExceptions)
             {
                 _throwExceptions = throwExceptions;

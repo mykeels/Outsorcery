@@ -1,11 +1,9 @@
 ﻿/*
     License: http://www.apache.org/licenses/LICENSE-2.0
  */
-
-using System;
-
 namespace Outsorcery
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -49,10 +47,10 @@ namespace Outsorcery
 
                 var result = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
 
+                // If the server sent us an exception then re-throw it as if we were operating locally.
                 var exception = result as Exception;
                 if (exception != null)
                 {
-                    // The server sent us back an exception. Throw it.
                     throw exception;
                 }
 

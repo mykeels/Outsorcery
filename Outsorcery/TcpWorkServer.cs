@@ -110,7 +110,7 @@ namespace Outsorcery
                     // Try to receive work from the client, if they close the connection then we'll catch the exception
                     workItem = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
 
-                    // do the work
+                    // do the work, capturing any exceptions that may occur
                     dynamic result = null;
                     Exception exception = null;
                     try
@@ -119,10 +119,10 @@ namespace Outsorcery
                     }
                     catch (Exception ex)
                     {
-                        exception = ex; // An exception occurred, send the exception to the client instead of the result
+                        exception = ex;
                     }
 
-                    // Send the client the result, if an exception occurred, send that instead
+                    // Send the client the result of the work item, if an exception occurred, send that instead
                     await connection.SendObjectAsync(exception ?? result, cancellationToken).ConfigureAwait(false);
 
                     // If an exception occurred, throw it again to trigger the handling 
