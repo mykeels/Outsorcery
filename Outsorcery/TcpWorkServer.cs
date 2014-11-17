@@ -111,10 +111,25 @@ namespace Outsorcery
                     workItem = await connection.ReceiveObjectAsync(cancellationToken).ConfigureAwait(false);
 
                     // do the work
-                    var result = await workItem.DoWorkAsync(cancellationToken).ConfigureAwait(false);
+                    dynamic result = null;
+                    Exception exception = null;
+                    try
+                    {
+                        result = await workItem.DoWorkAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        exception = ex; // An exception occurred, send the exception to the client instead of the result
+                    }
 
-                    // Send the client the result
-                    await connection.SendObjectAsync(result, cancellationToken).ConfigureAwait(false);
+                    // Send the client the result, if an exception occurred, send that instead
+                    await connection.SendObjectAsync(exception ?? result, cancellationToken).ConfigureAwait(false);
+
+                    // If an exception occurred, throw it again to trigger the handling 
+                    if (exception != null)
+                    {
+                        throw exception;
+                    }
                 }
             }
             catch (Exception ex)
