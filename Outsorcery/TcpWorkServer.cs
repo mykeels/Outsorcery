@@ -162,15 +162,12 @@ namespace Outsorcery
             }
             catch (Exception ex)
             {
-                if (RemoteWorkException != null)
-                {
-                    var message = string.Format(
-                           "An exception occurred when processing TCP client {0}:{1}.",
-                           endpoint != null ? endpoint.Address.ToString() : "????",
-                           endpoint != null ? endpoint.Port.ToString(CultureInfo.InvariantCulture) : "????");
+                var message = string.Format(
+                        "An exception occurred when processing TCP client {0}:{1}.",
+                        endpoint != null ? endpoint.Address.ToString() : "????",
+                        endpoint != null ? endpoint.Port.ToString(CultureInfo.InvariantCulture) : "????");
 
-                    OnWorkException(new WorkException(message, workItem, ex));
-                }
+                OnWorkException(new WorkException(message, workItem, ex));
             }
         }
     }
