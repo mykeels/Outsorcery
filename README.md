@@ -22,7 +22,7 @@ public class MyFirstWorkItem : IWorkItem<int>
 
     public Task<int> DoWorkAsync(CancellationToken cancellationToken)
     {
-      return Task.FromResult(TestValue * 5);
+        return Task.FromResult(TestValue * 5);
     }
 }            
 ```
@@ -109,12 +109,51 @@ var result = await worker.WithRetries(2)
                             .DoWorkAsync(myWorkItem, cancellationToken);
 ```
 
+You can limit which exceptions cause retries by supplying a predicate to the Retry Worker.
+```
+// CLIENT APPLICATION
+var worker = new OutsourcedWorker(provider);
+
+// Manual creation
+var result = await new RetryWorker(worker, 2, e => e.InnerException is CommunicationException)
+                            .DoWorkAsync(myWorkItem, cancellationToken);
+
+// Extension method
+var result = await worker.WithRetries(2, e => e.InnerException is CommunicationException)
+                            .DoWorkAsync(myWorkItem, cancellationToken);
+```
+
 Work Servers suppress all exceptions they encounter while processing a client connection and its associated work. To receive notification when client related exceptions occur, subscribe to the RemoteWorkException event.
 
 ```
 // SERVER APPLICATION
 var server = new TcpWorkServer(localEndPoint);
 server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
+```
+
+When an exception occurs during DoWorkAsync on the Work Server, that exception is returned to the client before closing the connection.  The Outsourced Worker then throws the exception on the client.  This allows you to react to work related exceptions on the client.  In the below example, we only retry the work if the exception that occurred is due to "Bad luck".
+
+```
+// WORK ITEM
+[Serializable]
+public class WorkItemWithExceptions : IWorkItem<int>
+{
+    public int WorkCategoryId { get { return 0; } }
+    
+    public Task<int> DoWorkAsync(CancellationToken cancellationToken)
+    {
+        if (new Random().Next(100) == 0)
+            throw new InvalidOperationException("Bad luck");
+        
+        return Task.FromResult(10);
+    }
+}     
+
+// CLIENT APPLICATION
+var worker = new OutsourcedWorker(provider);
+var result = await worker
+                    .WithRetries(2, e => e.InnerException.Message == "Bad luck")
+                    .DoWorkAsync(myWorkItem, cancellationToken);
 ```
 
 Timing Out
