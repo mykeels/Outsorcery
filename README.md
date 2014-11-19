@@ -127,7 +127,7 @@ var server = new TcpWorkServer(localEndPoint);
 server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
 ```
 
-When an exception occurs during DoWorkAsync on the Work Server, that exception is returned to the client before closing the connection.  The Outsourced Worker then re-throws the exception on the client.  This allows you to react to work related exceptions locally. In the below example, the work is only retried if the exception that occurred is due to "Bad luck".
+When an exception occurs during DoWorkAsync on the Work Server, that exception is returned to the client before closing the connection.  The Outsourced Worker then re-throws the exception on the client.  This allows you to react to work related exceptions locally. In the below example, the work is only retried by the client if the exception that occurred is due to "Bad luck".
 
 ```csharp
 // WORK ITEM
