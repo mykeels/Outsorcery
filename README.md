@@ -94,7 +94,7 @@ var worker = new OutsourcedWorker(provider);
 worker.WorkException += MyWorkerOnWorkExceptionHandler;
 ```
 
-You can suppress the first X exceptions that a Worker encounters and automatically attempt the work again using a [Retry Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/RetryWorker.cs). Retry Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.
+You can suppress the first X exceptions that a Worker encounters and automatically attempt the work again using a [Retry Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/RetryWorker.cs). Retry Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.  You can limit which exceptions cause retries by supplying an optional predicate to the Retry Worker.
 
 ```
 // CLIENT APPLICATION
@@ -107,19 +107,13 @@ var result = await new RetryWorker(worker, 2)
 // Extension method
 var result = await worker.WithRetries(2)
                             .DoWorkAsync(myWorkItem, cancellationToken);
-```
 
-You can limit which exceptions cause retries by supplying a predicate to the Retry Worker.
-```
-// CLIENT APPLICATION
-var worker = new OutsourcedWorker(provider);
-
-// Manual creation
+// Manual creation with predicate
 var result = 
     await new RetryWorker(worker, 2, e => e.InnerException is CommunicationException)
                 .DoWorkAsync(myWorkItem, cancellationToken);
 
-// Extension method
+// Extension method with predicate
 var result = 
     await worker.WithRetries(2, e => e.InnerException is CommunicationException)
                 .DoWorkAsync(myWorkItem, cancellationToken);
