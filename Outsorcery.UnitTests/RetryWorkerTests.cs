@@ -113,6 +113,30 @@ namespace Outsorcery.UnitTests
         }
 
         /// <summary>
+        /// ShouldRetry Predicate Limits Attempts Correctly
+        /// </summary>
+        /// <returns>An awaitable task.</returns>
+        [Test]
+        public async Task ShouldRetryPredicateLimitsRetriesCorrectly()
+        {
+            // ARRANGE
+            var worker = new RetryWorker(new LocalWorker(), MaxRetries, e => e.InnerException is CommunicationException);
+            var workItem = new TestWorkItem(true);
+
+            try
+            {
+                // ACT
+                await worker.DoWorkAsync(workItem, new CancellationToken());
+            }
+            catch
+            {
+            }
+
+            // ASSERT
+            Assert.That(workItem.AttemptCount, Is.EqualTo(2));
+        }
+
+        /// <summary>
         /// Test Work Item
         /// </summary>
         private class TestWorkItem : IWorkItem<int>
@@ -159,12 +183,17 @@ namespace Outsorcery.UnitTests
             {
                 ++AttemptCount;
 
-                if (_throwExceptions)
+                if (!_throwExceptions)
                 {
-                    throw new InvalidOperationException();
+                    return Task.FromResult(SuccessValue);
                 }
 
-                return Task.FromResult(SuccessValue);
+                if (AttemptCount >= 2)
+                {
+                    throw new InvalidOperationException("Fake invalid operation");
+                }
+
+                throw new CommunicationException("Communication failed", new Exception());
             }
         }
     }

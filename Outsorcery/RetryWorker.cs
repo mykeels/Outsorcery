@@ -22,7 +22,10 @@ namespace Outsorcery
 
         /// <summary>The delay between retries</summary>
         private readonly TimeSpan _delayBetweenRetries;
-        
+
+        /// <summary>Only retry when this predicate is true</summary>
+        private readonly Predicate<Exception> _retryWhen;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RetryWorker" /> class.
         /// </summary>
@@ -45,6 +48,32 @@ namespace Outsorcery
                     IWorker internalWorker,
                     int numberOfRetries,
                     TimeSpan delayBetweenRetries)
+            : this(internalWorker, numberOfRetries, null, delayBetweenRetries)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RetryWorker" /> class.
+        /// </summary>
+        /// <param name="internalWorker">The internal worker.</param>
+        /// <param name="numberOfRetries">The number of retries to make including the first one.</param>
+        /// <param name="retryWhen">Only retry when this predicate is true.</param>
+        public RetryWorker(
+                    IWorker internalWorker,
+                    int numberOfRetries,
+                    Predicate<Exception> retryWhen)
+            : this(internalWorker, numberOfRetries, retryWhen, TimeSpan.Zero)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RetryWorker" /> class.
+        /// </summary>
+        /// <param name="internalWorker">The internal worker.</param>
+        /// <param name="numberOfRetries">The number of retries to make including the first one.</param>
+        /// <param name="retryWhen">Only retry when this predicate is true.</param>
+        /// <param name="delayBetweenRetries">The delay between retries.</param>
+        public RetryWorker(IWorker internalWorker, int numberOfRetries, Predicate<Exception> retryWhen, TimeSpan delayBetweenRetries)
         {
             Contract.IsNotNull(internalWorker);
             Contract.IsGreaterThanZero(numberOfRetries);
@@ -52,6 +81,7 @@ namespace Outsorcery
             _internalWorker = internalWorker;
             _numberOfRetries = numberOfRetries;
             _delayBetweenRetries = delayBetweenRetries;
+            _retryWhen = retryWhen;
         }
 
         /// <summary>
@@ -80,6 +110,11 @@ namespace Outsorcery
                 catch (Exception ex)
                 {
                     exceptions.Add((ex is WorkException) ? ex.InnerException : ex);
+
+                    if (_retryWhen != null && !_retryWhen(ex))
+                    {
+                        break;
+                    }
                 }
 
                 if (_delayBetweenRetries > TimeSpan.Zero
