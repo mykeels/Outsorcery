@@ -42,7 +42,7 @@ namespace Outsorcery.ExampleWorkItems
         public async Task<ExampleWorkResult> DoWorkAsync(System.Threading.CancellationToken cancellationToken)
         {
             Console.WriteLine("Work started on this system");
-            
+
             await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
 
             var result = new ExampleWorkResult

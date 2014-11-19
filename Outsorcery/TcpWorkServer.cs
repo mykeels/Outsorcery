@@ -69,18 +69,46 @@ namespace Outsorcery
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                // The below is a shim for the lack of a cancellation token on AcceptTcpClientAsync.
-                // It'll leave the Accept active, but at least it provides graceful shutdown.
-                var client = await Task.Run(() => listener.AcceptTcpClientAsync(), cancellationToken)
-                                        .ConfigureAwait(false);
+                try
+                {
+                    // The below is a shim for the lack of a cancellation token on AcceptTcpClientAsync.
+                    // It'll leave the Accept active, but at least it provides graceful shutdown.
+                    var client = await Task.Run(() => listener.AcceptTcpClientAsync(), cancellationToken)
+                                            .ConfigureAwait(false);
 
-                clientTasks.Add(ProcessClientAsync(client, cancellationToken));
+                    clientTasks.Add(ProcessClientAsync(client, cancellationToken));
 
-                // Prevent the list of unresolved client tasks getting unnecessarily large
-                clientTasks = clientTasks.Where(w => !w.IsCompleted).ToList();
+                    // Prevent the list of unresolved client tasks getting unnecessarily large
+                    clientTasks = clientTasks.Where(w => !w.IsCompleted).ToList();
+                }
+                catch (Exception ex)
+                {
+                    const string message = "An exception occurred while accepting a connection.";
+                    OnWorkException(new WorkException(message, null, ex));
+                }
             }
 
-            await Task.WhenAll(clientTasks).ConfigureAwait(false);
+            try
+            {
+                await Task.WhenAll(clientTasks).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                const string message = "An exception occurred while waiting for outstanding client tasks to finish before shutting down.";
+                OnWorkException(new WorkException(message, null, ex));
+            }
+        }
+
+        /// <summary>
+        /// Called when [work exception].
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        protected virtual void OnWorkException(WorkException exception)
+        {
+            if (RemoteWorkException != null)
+            {
+                RemoteWorkException(this, new WorkExceptionEventArgs(exception));
+            }
         }
 
         /// <summary>
@@ -134,15 +162,12 @@ namespace Outsorcery
             }
             catch (Exception ex)
             {
-                if (RemoteWorkException != null)
-                {
-                    var message = string.Format(
-                           "An exception occurred when processing TCP client {0}:{1}.",
-                           endpoint != null ? endpoint.Address.ToString() : "????",
-                           endpoint != null ? endpoint.Port.ToString(CultureInfo.InvariantCulture) : "????");
+                var message = string.Format(
+                        "An exception occurred when processing TCP client {0}:{1}.",
+                        endpoint != null ? endpoint.Address.ToString() : "????",
+                        endpoint != null ? endpoint.Port.ToString(CultureInfo.InvariantCulture) : "????");
 
-                    RemoteWorkException(this, new WorkExceptionEventArgs(new WorkException(message, workItem, ex)));
-                }
+                OnWorkException(new WorkException(message, workItem, ex));
             }
         }
     }
