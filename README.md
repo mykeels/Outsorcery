@@ -147,6 +147,8 @@ public class WorkItemWithExceptions : IWorkItem<int>
 
 // CLIENT APPLICATION
 var worker = new OutsourcedWorker(provider);
+var myWorkItem = new WorkItemWithExceptions();
+
 var result = await worker
                     .WithRetries(2, e => e.InnerException.Message == "Bad luck")
                     .DoWorkAsync(myWorkItem, cancellationToken);
