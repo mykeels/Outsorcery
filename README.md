@@ -88,7 +88,7 @@ Exception Handling and Retries
 ------------------------------
 To receive notification when a Worker encounters an exception, subscribe to the WorkException event.  This event occurs even if an exception is suppressed by a Retry so can be useful for keeping track of your application's silent failures.
 
-```
+```csharp
 // CLIENT APPLICATION
 var worker = new OutsourcedWorker(provider);
 worker.WorkException += MyWorkerOnWorkExceptionHandler;
@@ -96,7 +96,7 @@ worker.WorkException += MyWorkerOnWorkExceptionHandler;
 
 You can suppress the first X exceptions that a Worker encounters and automatically attempt the work again using a [Retry Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/RetryWorker.cs). Retry Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.  You can limit which exceptions cause retries by supplying an optional predicate to the Retry Worker.
 
-```
+```csharp
 // CLIENT APPLICATION
 var worker = new OutsourcedWorker(provider);
 
@@ -121,7 +121,7 @@ var result =
 
 Work Servers suppress all exceptions that they encounter while processing a client connection and its associated work. To receive notification when client related exceptions occur, subscribe to the RemoteWorkException event.
 
-```
+```csharp
 // SERVER APPLICATION
 var server = new TcpWorkServer(localEndPoint);
 server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
@@ -129,7 +129,7 @@ server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
 
 When an exception occurs during DoWorkAsync on the Work Server, that exception is returned to the client before closing the connection.  The Outsourced Worker then re-throws the exception on the client.  This allows you to react to work related exceptions locally. In the below example, the work is only retried if the exception that occurred is due to "Bad luck".
 
-```
+```csharp
 // WORK ITEM
 [Serializable]
 public class WorkItemWithExceptions : IWorkItem<int>
