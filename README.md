@@ -1,6 +1,6 @@
 Outsorcery
 ==========
-[Available on NuGet](https://www.nuget.org/packages/Outsorcery/)    -    [Request New Features Here](https://github.com/SteveLillis/Outsorcery/issues)
+[Available on NuGet](https://www.nuget.org/packages/Outsorcery/) <<>> [Request New Features Here](https://github.com/SteveLillis/Outsorcery/issues)
 
 Overview
 --------
