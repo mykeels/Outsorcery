@@ -1,6 +1,6 @@
 Outsorcery
 ==========
-[Available on NuGet](https://www.nuget.org/packages/Outsorcery/) - [Request New Features Here](https://github.com/SteveLillis/Outsorcery/issues)
+[Available on NuGet](https://www.nuget.org/packages/Outsorcery/) <<>> [Request New Features Here](https://github.com/SteveLillis/Outsorcery/issues)
 
 Overview
 --------
@@ -22,7 +22,7 @@ public class MyFirstWorkItem : IWorkItem<int>
 
     public Task<int> DoWorkAsync(CancellationToken cancellationToken)
     {
-      return Task.FromResult(TestValue * 5);
+        return Task.FromResult(TestValue * 5);
     }
 }            
 ```
@@ -88,15 +88,15 @@ Exception Handling and Retries
 ------------------------------
 To receive notification when a Worker encounters an exception, subscribe to the WorkException event.  This event occurs even if an exception is suppressed by a Retry so can be useful for keeping track of your application's silent failures.
 
-```
+```csharp
 // CLIENT APPLICATION
 var worker = new OutsourcedWorker(provider);
 worker.WorkException += MyWorkerOnWorkExceptionHandler;
 ```
 
-You can suppress the first X exceptions that a Worker encounters and automatically attempt the work again using a [Retry Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/RetryWorker.cs). Retry Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.
+You can suppress the first X exceptions that a Worker encounters and automatically attempt the work again using a [Retry Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/RetryWorker.cs). Retry Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.  You can limit which exceptions cause retries by supplying an optional predicate to the Retry Worker.
 
-```
+```csharp
 // CLIENT APPLICATION
 var worker = new OutsourcedWorker(provider);
 
@@ -107,21 +107,58 @@ var result = await new RetryWorker(worker, 2)
 // Extension method
 var result = await worker.WithRetries(2)
                             .DoWorkAsync(myWorkItem, cancellationToken);
+
+// Manual creation with predicate
+var result = 
+    await new RetryWorker(worker, 2, e => e.InnerException is CommunicationException)
+                .DoWorkAsync(myWorkItem, cancellationToken);
+
+// Extension method with predicate
+var result = 
+    await worker.WithRetries(2, e => e.InnerException is CommunicationException)
+                .DoWorkAsync(myWorkItem, cancellationToken);
 ```
 
-Work Servers suppress all exceptions they encounter while processing a client connection and its associated work. To receive notification when client related exceptions occur, subscribe to the RemoteWorkException event.
+Work Servers suppress all exceptions that they encounter while processing a client connection and its associated work. To receive notification when client related exceptions occur, subscribe to the RemoteWorkException event.
 
-```
+```csharp
 // SERVER APPLICATION
 var server = new TcpWorkServer(localEndPoint);
 server.RemoteWorkException += MyServerOnRemoteWorkExceptionHandler;
+```
+
+When an exception occurs during DoWorkAsync on the Work Server, that exception is returned to the client before closing the connection.  The Outsourced Worker then re-throws the exception on the client.  This allows you to react to work related exceptions locally. In the below example, the work is only retried by the client if the exception that occurred is due to "Bad luck".
+
+```csharp
+// WORK ITEM
+[Serializable]
+public class WorkItemWithExceptions : IWorkItem<int>
+{
+    public int WorkCategoryId { get { return 0; } }
+    
+    public Task<int> DoWorkAsync(CancellationToken cancellationToken)
+    {
+        if (new Random().Next(100) == 0)
+            throw new InvalidOperationException("Bad luck");
+        
+        return Task.FromResult(10);
+    }
+}     
+
+// CLIENT APPLICATION
+var worker = new OutsourcedWorker(provider);
+var myWorkItem = new WorkItemWithExceptions();
+
+var result = await worker
+                    .WithRetries(2, e => e.InnerException.Message == "Bad luck")
+                    .DoWorkAsync(myWorkItem, cancellationToken);
 ```
 
 Timing Out
 ----------
 All workers will wait as long as it takes to finish doing the work before returning.  You can set a timeframe in which they must complete the work or be automatically cancelled by using a [Timeout Worker](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/TimeoutWorker.cs).  Timeout Workers can be created manually or by using the [fluent extensions](https://github.com/SteveLillis/Outsorcery/blob/master/Outsorcery/FluentWorkerExtensions.cs) provided.
 
-```
+```csharp
 // CLIENT APPLICATION
 var worker = new OutsourcedWorker(provider);
 
@@ -133,5 +170,3 @@ var result = await new TimeoutWorker(worker, TimeSpan.FromSeconds(5))
 var result = await worker.WithTimeout(TimeSpan.FromSeconds(5))
                         .DoWorkAsync(myWorkItem, cancellationToken);
 ```
-
-
